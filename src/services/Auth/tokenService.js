@@ -1,31 +1,37 @@
 import { local } from "../storage/general";
 import doRequest from "../helpers";
 
-export const signinService = async (form) => {
+export const LoginService = async (form) => {
     const body = {
         email: form.email,
-        password: form.password
+        password: form.password,
+        remind: form.remind
     };
     const [result, error] = await doRequest(
-        "/Auth/auth/signin",
+        "/Login/Authenticate",
         "POST",
         body
     );
+    
     if (error)
-        return;
-    const { data } = result;
-    if (!data?.token)
-        return false;
-    const { token } = result.data.token;
-    saveToken(token);
-    return true;
-}
+        return { logged: false, msg: error.message};
 
-export const saveToken = token => {
+    const token = result?.token;
+    if (!token)
+        return { logged: false, msg: result?.detail?.mensaje};
+    
+    saveToken(token, result?.user);
+    return { logged: true, msg: null};
+}
+export const saveToken = (token, user) => {
     local.set("token", token);
+    local.set("user", user);
 }
 export const getToken = () => {
     return local.get("token");
+}
+export const getUser = () => {
+    return local.get("user");
 }
 export const isLogged = () => {
     return local.get("token") ? true : false;

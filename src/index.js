@@ -10,10 +10,19 @@ import AdminLayout from "layouts/Admin.js";
 ReactDOM.render(
   <HashRouter>
     <Switch>
+      {/* Ruta de autenticación, sin verificación del token */}
       <Route path={`/auth`} component={AuthLayout} />
-      <Route path={`/admin`} component={AdminLayout} />
-      {/* <Route path={`/rtl`} component={RTLLayout} /> */}
-      <Redirect from={`*`} to={ !isLogged() ? '/auth/login' : '/admin/dashboard' } />
+      
+      {/* Ruta protegida para admin, solo permite acceso si está autenticado */}
+      <Route path={`/admin`} render={(props) => (
+        isLogged() ? (
+          <AdminLayout {...props} />
+        ) : (
+          <Redirect to="/auth/login" />
+        )
+      )} />      
+      {/* Redirección por defecto al login si no se encuentra ninguna ruta */}
+      <Redirect from={`*`} to='/auth/login' />
     </Switch>
   </HashRouter>,
   document.getElementById("root")

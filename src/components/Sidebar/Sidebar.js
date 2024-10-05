@@ -22,6 +22,7 @@ import { SidebarHelp } from "components/Sidebar/SidebarHelp";
 import PropTypes from "prop-types";
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
+import { clearAllStorage } from "services/Auth/tokenService";
 
 // FUNCTIONS
 
@@ -131,6 +132,12 @@ function Sidebar(props) {
             </Button>
           ) : (
             <Button
+              onClick={() => {
+                if (prop.path === "/login") {
+                  // Limpia el local storage solo si es "Cerrar Sesión"
+                  clearAllStorage();
+                }
+              }}
               boxSize='initial'
               justifyContent='flex-start'
               alignItems='center'
@@ -174,7 +181,7 @@ function Sidebar(props) {
                 <Text color={inactiveColor} my='auto' fontSize='sm'>
                   {document.documentElement.dir === "rtl"
                     ? prop.rtlName
-                    : prop.name}
+                    : prop.name }
                 </Text>
               </Flex>
             </Button>
@@ -195,7 +202,7 @@ function Sidebar(props) {
   var brand = (
     <Box pt={"25px"} mb='12px'>
       <Link
-        href={`${process.env.PUBLIC_URL}/#/`}
+        href={`${process.env.PUBLIC_URL}/`}
         target='_blank'
         display='flex'
         lineHeight='100%'
@@ -292,7 +299,7 @@ export function SidebarResponsive(props) {
               py='12px'>
               {document.documentElement.dir === "rtl"
                 ? prop.rtlName
-                : prop.name}
+                : prop.name }
             </Text>
             {createLinks(prop.views)}
           </>
@@ -344,12 +351,18 @@ export function SidebarResponsive(props) {
                 <Text color={activeColor} my='auto' fontSize='sm'>
                   {document.documentElement.dir === "rtl"
                     ? prop.rtlName
-                    : prop.name}
+                    : prop.name }
                 </Text>
               </Flex>
             </Button>
           ) : (
             <Button
+              onClick={() => {
+                if (prop.path === "/login") {
+                  // Limpia el local storage solo si es "Cerrar Sesión"
+                  clearAllStorage();
+                }
+              }}
               boxSize='initial'
               justifyContent='flex-start'
               alignItems='center'
@@ -392,7 +405,7 @@ export function SidebarResponsive(props) {
                 <Text color={inactiveColor} my='auto' fontSize='sm'>
                   {document.documentElement.dir === "rtl"
                     ? prop.rtlName
-                    : prop.name}
+                    : prop.name }	
                 </Text>
               </Flex>
             </Button>

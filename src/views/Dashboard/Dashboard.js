@@ -48,19 +48,20 @@ import {
 	lineChartOptionsDashboard
 } from 'variables/charts';
 import { dashboardTableData, timelineData } from 'variables/general';
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
+import { getUser } from "services/Auth/tokenService";
 
 export default function Dashboard() {
+	const [dataUser, setDataUser] = useState(null);
+	const user = getUser();
 
-	useEffect(() => {
+	useEffect(() => {		
 		document.title = "Morochita | Admin";
-		/* if (getToken()) {
-			navigate(homePage);
-			return;
-		} */
-		//setReadyView(true);
+		if (user){
+			setDataUser(user);
+		}
 	}, []);
-
 	return (
 		<Flex flexDirection='column' pt={{ base: '120px', md: '75px' }}>
 			<SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
@@ -201,15 +202,15 @@ export default function Dashboard() {
 									Bienvenid@,
 								</Text>
 								<Text fontSize='28px' color='#fff' fontWeight='bold' mb='18px'>
-									Mark Johnson
+									{dataUser ? dataUser.name + " " + dataUser.last_name : "Usuario"}
 								</Text>
 								<Text fontSize='md' color='gray.400' fontWeight='normal' mb='auto'>
-									Glad to see you again! <br />
-									Ask me anything.
+									Gestiona tus procesos desde la barra lateral o el ícono del menú.
 								</Text>
 								<Spacer />
 								<Flex align='center'>
 									<Button
+										onClick={() => console.log("Ir al perfil")}
 										p='0px'
 										variant='no-hover'
 										bg='transparent'
@@ -222,7 +223,7 @@ export default function Dashboard() {
 											transition='all .3s ease'
 											my={{ sm: '1.5rem', lg: '0px' }}
 											_hover={{ me: '4px' }}>
-											Tab to record
+											Ir al perfil
 										</Text>
 										<Icon
 											as={BsArrowRight}

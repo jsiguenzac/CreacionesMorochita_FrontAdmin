@@ -16,22 +16,30 @@ import {
   Switch,
   Text,
   DarkMode,
+  useDisclosure,
+  InputGroup,
+  InputRightElement,
+  Icon
 } from "@chakra-ui/react";
 
 // Assets
 import signinImage from "assets/img/fondoHome.png";
-import { signinService } from "../../services/Auth/tokenService";
+import { LoginService } from "../../services/Auth/tokenService";
 // Custom Components
 import AuthFooter from "components/Footer/AuthFooter";
 import GradientBorder from "components/GradientBorder/GradientBorder";
 import DotSpin from "components/utils/BounciLoader";
+import { CustomModal } from "components/Modal/ModalMessage";
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 function signin() {
   const navigate = useHistory().push;
   const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
   const [form, setForm] = useState({
     email: "",
-    password: ""
+    password: "",
+    remind: false
   });
 
   const changeForm = (field, value) => {
@@ -47,18 +55,25 @@ function signin() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const logged = await signinService(form);
+      setErr("");
+      const {logged, msg} = await LoginService(form);
       console.log("auth/signin Successful:", logged);
-      navigate(homePage);
+      if (logged)
+        navigate(homePage);
+      else if (msg === "USUARIO_NO_ENCONTRADO")
+        setErr("El DNI o Correo Electrónico no está registrado");
+      else if (msg === "CLAVE_INCORRECTA")
+        setErr("La contraseña es incorrecta");
+      handleShowModal();
     } catch (error) {
       console.error("Error during auth/signin:", error);
       return;
     } finally {
       setLoading(false);
-      navigate(homePage);
+      //navigate(homePage);
     }
   };  
-  const { email, password } = form;
+  const { email, password, remind } = form;
 
   useEffect(() => {
     document.title = "Morochita | Login";
@@ -68,6 +83,18 @@ function signin() {
     }
     //setReadyView(true);
   }, []);
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const handleShowModal = () => {
+      onOpen();
+  };
+
+  const [showPassword, setShowPassword] = useState(false); // Estado para controlar visibilidad
+
+  const toggleShowPassword = () => {
+      setShowPassword(!showPassword); // Alternar entre mostrar y ocultar contraseña
+  };
 
 
   return (
@@ -143,7 +170,7 @@ function signin() {
                 color='white'>
                 Contraseña
               </FormLabel>
-              <GradientBorder
+              {/* <GradientBorder
                 mb='24px'
                 w={{ base: "100%", lg: "fit-content" }}
                 borderRadius='20px'>
@@ -162,11 +189,48 @@ function signin() {
                   value={password}
                   onChange={(e) => changeForm("password", e.target.value)}
                 />
+              </GradientBorder> */}
+              <GradientBorder
+                  mb='24px'
+                  w={{ base: "100%", lg: "fit-content" }}
+                  borderRadius='20px'
+              >
+                  <InputGroup size="lg">
+                      <Input
+                          color='white'
+                          bg='rgb(19,21,54)'
+                          border='transparent'
+                          borderRadius='20px'
+                          fontSize='sm'
+                          size='lg'
+                          w={{ base: "100%", md: "346px" }}
+                          maxW='100%'
+                          type={showPassword ? 'text' : 'password'} // Condicional para cambiar el tipo de input
+                          placeholder='Ingresa tu contraseña'
+                          autoComplete='off'
+                          value={password}
+                          onChange={(e) => changeForm("password", e.target.value)}
+                      />
+                      <InputRightElement width="3rem">
+                          <Icon
+                              as={showPassword ? FaEyeSlash : FaEye} // Ícono depende del estado
+                              color="gray.500"
+                              cursor="pointer"
+                              onClick={toggleShowPassword} // Alterna la visibilidad
+                          />
+                      </InputRightElement>
+                  </InputGroup>
               </GradientBorder>
             </FormControl>
             <FormControl display='flex' alignItems='center'>
               <DarkMode>
-                <Switch id='remember-auth/signin' colorScheme='brand' me='10px' />
+                <Switch 
+                id='remember-auth/signin' 
+                colorScheme='brand'
+                me='10px'
+                isChecked={form.remind}
+                onChange={(e) => changeForm("remind", e.target.checked)} 
+                />
               </DarkMode>
               <FormLabel
                 htmlFor='remember-auth/signin'
@@ -252,6 +316,12 @@ function signin() {
           </Box>
         </Box>
       </Flex>
+      <CustomModal
+          header="Upss!"
+          message={err || "Credenciales Incorrectas"}
+          isOpen={isOpen}
+          onClose={onClose}
+      />
       {loading && <DotSpin message="Iniciando Sesión..." />}
     </Flex>
   );

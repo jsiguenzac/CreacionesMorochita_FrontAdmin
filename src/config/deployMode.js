@@ -1,9 +1,8 @@
 export const IS_PRODUCTION = false;
-export const ALLOW_DURATION_EVENT_UPDATE = false;
 const API_URL_GROUP = {
-    LOCAL_DEV: "http://localhost",
+    LOCAL_DEV: "http://127.0.0.1:8000",
     DEV: "http://",
     TEST: "http://",
     PROD: ""  
 };
-export const API_URL = IS_PRODUCTION ? API_URL_GROUP.PRE_PROD : API_URL_GROUP.DEV; 
+export const API_URL = IS_PRODUCTION ? API_URL_GROUP.DEV : API_URL_GROUP.LOCAL_DEV; 
