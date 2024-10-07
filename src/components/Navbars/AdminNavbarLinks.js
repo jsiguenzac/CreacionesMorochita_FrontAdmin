@@ -44,6 +44,7 @@ export default function HeaderLinks(props) {
   const settingsRef = React.useRef();
   return (
     <Flex
+      cursor='pointer'
       pe={{ sm: "0px", md: "16px" }}
       w={{ sm: "100%", md: "auto" }}
       alignItems='center'
@@ -110,8 +111,7 @@ export default function HeaderLinks(props) {
         </Button>
       </NavLink> */}
       <SidebarResponsive
-        cursor='pointer'
-        iconColor='gray.500'
+        iconColor={navbarIcon}
         logoText={props.logoText}
         secondary={props.secondary}
         routes={routes}
@@ -142,7 +142,7 @@ export default function HeaderLinks(props) {
             <MenuItem
               borderRadius='8px'
               _hover={{
-                bg: "transparent",
+                bg: "purple.700",
               }}
               _active={{
                 bg: "transparent",
@@ -162,7 +162,7 @@ export default function HeaderLinks(props) {
             <MenuItem
               borderRadius='8px'
               _hover={{
-                bg: "transparent",
+                bg: "purple.700",
               }}
               _active={{
                 bg: "transparent",
@@ -183,7 +183,7 @@ export default function HeaderLinks(props) {
             <MenuItem
               borderRadius='8px'
               _hover={{
-                bg: "transparent",
+                bg: "purple.700",
               }}
               _active={{
                 bg: "transparent",

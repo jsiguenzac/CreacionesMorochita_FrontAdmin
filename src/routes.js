@@ -1,24 +1,9 @@
-/*!
-
-=========================================================
-* Vision UI Free Chakra - v1.0.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/vision-ui-free-chakra
-* Copyright 2021 Creative Tim (https://www.creative-tim.com/)
-* Licensed under MIT (https://github.com/creativetimofficial/vision-ui-free-chakra/blob/master LICENSE.md)
-
-* Design and Coded by Simmmple & Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-
 // import
 import Dashboard from "views/Dashboard/Dashboard.js";
 import Tables from "views/Dashboard/Tables.js";
+import Sales from "views/Dashboard/Sales.js";
+import Users from "views/Dashboard/Users.js";
+import Client from "views/Dashboard/Client.js";
 import Billing from "views/Dashboard/Billing.js";
 import RTLPage from "views/RTL/RTLPage.js";
 import Profile from "views/Dashboard/Profile.js";
@@ -34,7 +19,9 @@ import {
   RocketIcon,
   LogoutIcon,
   SupportIcon,
+  ProfileIcon,
   GlobeIcon,
+  CartIcon
 } from "components/Icons/Icons";
 
 var dashRoutes = [
@@ -47,11 +34,11 @@ var dashRoutes = [
     layout: "/admin",
   },
   {
-    path: "/tables",
+    path: "/ventas",
     name: "Ventas",
     rtlName: "لوحة القيادة",
-    icon: <StatsIcon color='inherit' />,
-    component: Tables,
+    icon: <CartIcon color='inherit' />,
+    component: Sales,
     layout: "/admin",
   },
   {
@@ -63,19 +50,19 @@ var dashRoutes = [
     layout: "/admin",
   },
   {
-    path: "/tables",
+    path: "/usuarios",
     name: "Usuarios",
     rtlName: "لوحة القيادة",
     icon: <GlobeIcon color='inherit' />,
-    component: Tables,
+    component: Users,
     layout: "/admin",
   },
   {
-    path: "/tables",
+    path: "/clientes",
     name: "Clientes",
     rtlName: "لوحة القيادة",
     icon: <GlobeIcon color='inherit' />,
-    component: Tables,
+    component: Client,
     layout: "/admin",
   },
   /* {

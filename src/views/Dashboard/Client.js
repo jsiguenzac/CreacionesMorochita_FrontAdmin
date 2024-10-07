@@ -27,7 +27,7 @@ import { tablesProjectData, tablesTableData } from "variables/general";
 // Icons
 import { AiFillCheckCircle } from "react-icons/ai";
 
-function Tables() {
+function Client() {
   return (
     <Flex direction='column' pt={{ base: "120px", md: "75px" }}>
       {/* Authors Table */}
@@ -165,4 +165,4 @@ function Tables() {
   );
 }
 
-export default Tables;
+export default Client;

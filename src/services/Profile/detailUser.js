@@ -1,5 +1,6 @@
 import { getToken } from "services/Auth/tokenService";
 import doRequest from "../helpers";
+import { saveUser, removeUser } from "services/Auth/tokenService";
 
 export const DetailUser = async (id_user) => {
     const [result, error] = await doRequest(

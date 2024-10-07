@@ -20,12 +20,18 @@ export const LoginService = async (form) => {
     if (!token)
         return { logged: false, msg: result?.detail?.mensaje};
     
-    saveToken(token, result?.user);
+    saveToken(token);
+    saveUser(result?.user);
     return { logged: true, msg: null};
 }
-export const saveToken = (token, user) => {
+export const saveToken = (token) => {
     local.set("token", token);
+}
+export const saveUser = (user) => {
     local.set("user", user);
+}
+export const removeUser = () => {
+    local.remove("user");
 }
 export const getToken = () => {
     return local.get("token");

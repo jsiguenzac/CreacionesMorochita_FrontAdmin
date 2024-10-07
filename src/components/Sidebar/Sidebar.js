@@ -41,7 +41,13 @@ function Sidebar(props) {
   const createLinks = (routes) => {
     const { sidebarVariant } = props;
     // Chakra Color Mode
-    let activeBg = "#1A1F37";
+    //let activeBg = "#1A1F37";
+    const activeBg = "brand.200"; // Color Boton Activo SIDEBAR
+    const hoverBg = {
+      bg: "purple.700", // color de fondo al pasar el mouse SIDEBAR
+      transform: "none",
+      borderColor: "transparent",
+    };
     let inactiveBg = "#1A1F37";
     let activeColor = "white";
     let inactiveColor = "white";
@@ -154,7 +160,7 @@ function Sidebar(props) {
                 xl: "16px",
               }}
               borderRadius='15px'
-              _hover='none'
+              _hover={hoverBg}
               w='100%'
               _active={{
                 bg: "inherit",
@@ -271,7 +277,12 @@ export function SidebarResponsive(props) {
   // this function creates the links and collapses that appear in the sidebar (left menu)
   const createLinks = (routes) => {
     // Chakra Color Mode
-    const activeBg = "#1A1F37";
+    const activeBg = "brand.200"; // Color Boton Activo SIDEBAR
+    const hoverBg = {
+      bg: "purple.700", // color de fondo al pasar el mouse SIDEBAR
+      transform: "none",
+      borderColor: "transparent",
+    };
     const inactiveBg = "#1A1F37";
     const activeColor = "white";
     const inactiveColor = "white";
@@ -379,7 +390,7 @@ export function SidebarResponsive(props) {
                 xl: "16px",
               }}
               borderRadius='15px'
-              _hover='none'
+              _hover={hoverBg}
               w='100%'
               _active={{
                 bg: "inherit",

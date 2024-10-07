@@ -39,7 +39,7 @@ import { BsArrowRight } from 'react-icons/bs';
 import { FaFacebook, FaInstagram, FaPencilAlt, FaTwitter } from 'react-icons/fa';
 // Icons
 import { IoDocumentsSharp, IoKey, IoKeyOutline, IoKeySharp } from 'react-icons/io5';
-import { getUser, clearAllStorage } from 'services/Auth/tokenService';
+import { getUser, clearAllStorage, removeUser, saveUser } from 'services/Auth/tokenService';
 // Data
 import {
 	lineChartDataProfile1,
@@ -48,7 +48,7 @@ import {
 	lineChartOptionsProfile2
 } from 'variables/charts';
 import { React, useState, useEffect } from 'react';
-import { DetailUser } from 'services/Profile/detailUser';
+import { DetailUser } from 'services/Profile/DetailUser';
 import { CustomModal } from "components/Modal/ModalMessage";
 import DotSpin from 'components/utils/BounciLoader';
 
@@ -76,18 +76,18 @@ export default function Profile() {
             const { data, msg } = await DetailUser(user.id_user);
 
             if (data) {
+				removeUser();
+				saveUser(data);
                 setDataUser(data);
             } else if (msg === "USUARIO_NO_ENCONTRADO" || msg === "USUARIO_INACTIVO") {
-                clearAllStorage();
+				clearAllStorage();
                 setErr("Error al obtener datos del usuario");
-                handleShowModal();
             } else {
                 console.error("Error al obtener datos del usuario", msg);
             }
         } catch (error) {
             console.error("Error al obtener datos del usuario", error);
             setErr("Error al obtener datos del usuario");
-            handleShowModal();
         } finally {
             setLoading(false);
         }
@@ -226,7 +226,7 @@ export default function Profile() {
 						INFORMACIÓN
 						</Text>
 						<Text fontSize="sm" color="gray.400">
-						Hola, {dataUser?.name || 'User'} {dataUser?.last_name || ''}. Observa tu información actualizada.
+						Hola, {dataUser?.name || 'User'}. Observa tu información actualizada.
 						</Text>
 					</Flex>
 					</CardHeader>
@@ -421,12 +421,6 @@ export default function Profile() {
 				</Card>
 			</Flex>
 
-			<CustomModal
-				header="Upss!"
-				message={err || "No se pudo cargar la información del usuario"}
-				isOpen={isOpen}
-				onClose={onClose}
-			/>
 			{loading && <DotSpin message="Cargando Perfil..." />}
 		</Flex>
 	);
