@@ -4,26 +4,29 @@ import {
   Button,
   Flex,
   Td,
+  Icon,
   Text,
   Tr,
   useColorModeValue,
 } from "@chakra-ui/react";
 import React from "react";
+import { FaPencilAlt } from 'react-icons/fa';
 
 function TablesTableRow(props) {
   const {
     logo,
     name,
     email,
+    dni,
     subdomain,
     domain,
     status,
     date,
     lastItem,
   } = props;
-  const textColor = useColorModeValue("gray.700", "white");
-  const bgStatus = useColorModeValue("gray.400", "#1a202c");
-  const colorStatus = useColorModeValue("white", "gray.400");
+  // const textColor = useColorModeValue("gray.700", "white");
+  // const bgStatus = useColorModeValue("gray.400", "#1a202c");
+  const colorStatus = useColorModeValue("white", "gray.600");
 
   return (
     <Tr>
@@ -33,13 +36,13 @@ function TablesTableRow(props) {
         border={lastItem ? "none" : null}
         borderBottomColor='#56577A'>
         <Flex align='center' py='.8rem' minWidth='100%' flexWrap='nowrap'>
-          <Avatar
+          {/* <Avatar
             src={logo}
             w='50px'
             borderRadius='12px'
             me='18px'
             border='none'
-          />
+          /> */}
           <Flex direction='column'>
             <Text
               fontSize='sm'
@@ -60,24 +63,37 @@ function TablesTableRow(props) {
         borderBottomColor='#56577A'
         minW='150px'>
         <Flex direction='column'>
-          <Text fontSize='sm' color='#fff' fontWeight='normal'>
+        <Text fontSize='sm' color='#fff' fontWeight='normal'>
+            {dni}
+          </Text>
+          {/*<Text fontSize='sm' color='#fff' fontWeight='normal'>
             {domain}
           </Text>
           <Text fontSize='sm' color='gray.400' fontWeight='normal'>
             {subdomain}
+          </Text> */}
+        </Flex>
+      </Td>
+      <Td
+        border={lastItem ? "none" : null}
+        borderBottomColor='#56577A'
+        minW='150px'>
+        <Flex direction='column'>
+          <Text fontSize='sm' color='#fff' fontWeight='normal'>
+            {domain}
           </Text>
         </Flex>
       </Td>
       <Td border={lastItem ? "none" : null} borderBottomColor='#56577A'>
         <Badge
-          bg={status === "Online" ? "green.400" : "transparent"}
-          color={status === "Online" ? "white" : colorStatus}
+          bg={status ? "green.400" : "gray.600"}
+          color={status ? "white" : colorStatus}
           fontSize='sm'
           p='3px 10px'
           borderRadius='8px'
-          border={status === "Online" ? "none" : "1px solid #fff"}
+          border="none" /* {!status ? "none" : "1px solid #fff"} */
           fontWeight='normal'>
-          {status}
+          {status ? "Activo" : "Inactivo"}
         </Badge>
       </Td>
       <Td border={lastItem ? "none" : null} borderBottomColor='#56577A'>
@@ -86,13 +102,26 @@ function TablesTableRow(props) {
         </Text>
       </Td>
       <Td border={lastItem ? "none" : null} borderBottomColor='#56577A'>
-        <Button p='0px' bg='transparent' variant='no-hover'>
+        {/* <Button p='0px' bg='transparent' variant='no-hover'>
           <Text
             fontSize='sm'
             color='gray.400'
             fontWeight='bold'
+            border='1px solid #fff'
             cursor='pointer'>
             Editar
+          </Text>
+        </Button> */}
+        <Button
+          /* onClick={onOpenEdit} */
+          borderRadius='12px'
+          bg='brand.200'
+          _hover={{ opacity: '0.8' }}
+          _active={{ opacity: '0.9' }}
+          me={{ base: 'none', lg: '20px' }}
+          leftIcon={<Icon color='white' as={FaPencilAlt} me='6px' />}>
+          <Text fontSize='xs' color='#fff' fontWeight='bold'>
+            EDITAR
           </Text>
         </Button>
       </Td>
