@@ -312,41 +312,77 @@ export const tablesTableData = [
   }, */
 ];
 
-export const tablesProjectData = [
+export const tablesProjectDataInventory = [
   {
     logo: AdobexdLogo,
-    name: "Vision UI Version",
-    budget: "$14,000",
-    status: "Working",
+    name: "Pantalón Jean de Caballero",
+    budget: "S/. 65",
+    status: "45",
+    category: "Pantalones",
     progression: 60,
   },
   {
     logo: AtlassianLogo,
-    name: "Add Progress Track",
-    budget: "$3,000",
-    status: "Canceled",
-    progression: 10,
+    name: "Polo de Algodón Cuello V",
+    budget: "S/. 25",
+    status: "20",
+    progression: 40,
+    category: "Polos",
   },
   {
     logo: SlackLogo,
-    name: "Fix Platform Errors",
-    budget: "Not set",
-    status: "Done",
+    name: "Cafarena de Dama",
+    budget: "S/. 25",
+    status: "10",
+    category: "Cafarenas",
     progression: 100,
   },
   {
     logo: SpotifyLogo,
-    name: "Launch our Mobile App",
-    budget: "$32,000",
-    status: "Done",
+    name: "Pant. Jean Palazo",
+    budget: "S/. 60",
+    status: "12",
+    category: "Pantalones",
     progression: 100,
   },
+];
+
+export const tablesProjectDataClient = [
   {
-    logo: JiraLogo,
-    name: "Add the New Pricing Page",
-    budget: "$400",
+    logo: AdobexdLogo,
+    name: "Gabriel Palacios",
+    dni: 76411904,
+    phone: "987654321",
+    budget: "S/. 1400",
+    email: "gpal@gmail.com",
     status: "Working",
-    progression: 25,
+  },
+  {
+    logo: AtlassianLogo,
+    name: "Maria Guevara",
+    dni: 76411904,
+    phone: "987653331",
+    budget: "S/. 400",
+    email: "mgar@gmail.com",
+    status: "Working",
+  },
+  {
+    logo: SlackLogo,
+    name: "Felipe Castillo",
+    dni: 76411900,
+    phone: "987653300",
+    budget: "S/. 40",
+    email: "fcast@gmail.com",
+    status: "Working",
+  },
+  {
+    logo: SpotifyLogo,
+    name: "Ana Sandoval",
+    dni: 76412000,
+    phone: "98744653",
+    budget: "S/. 240",
+    email: "sand@gmail.com",
+    status: "Working",
   },
 ];
 

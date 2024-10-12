@@ -10,7 +10,7 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import React from "react";
-import { FaPencilAlt } from 'react-icons/fa';
+import { FaPencilAlt, FaTrash } from 'react-icons/fa';
 
 function TablesTableRow(props) {
   const {
@@ -112,18 +112,32 @@ function TablesTableRow(props) {
             Editar
           </Text>
         </Button> */}
-        <Button
-          /* onClick={onOpenEdit} */
-          borderRadius='12px'
-          bg='brand.200'
-          _hover={{ opacity: '0.8' }}
-          _active={{ opacity: '0.9' }}
-          me={{ base: 'none', lg: '20px' }}
-          leftIcon={<Icon color='white' as={FaPencilAlt} me='6px' />}>
-          <Text fontSize='xs' color='#fff' fontWeight='bold'>
-            EDITAR
-          </Text>
-        </Button>
+        <Flex direction={{ base: "column", md: "row" }} gap="20px">
+          <Button
+            /* onClick={onOpenEdit} */
+            borderRadius='12px'
+            bg='brand.200'
+            _hover={{ opacity: '0.8' }}
+            _active={{ opacity: '0.9' }}
+            me={{ base: 'none', lg: '20px' }}
+            leftIcon={<Icon color='white' as={FaPencilAlt} me='6px' />}>
+            <Text fontSize='xs' color='#fff' fontWeight='bold'>
+              EDITAR
+            </Text>
+          </Button>
+          <Button
+            /* onClick={onOpenEdit} */
+            borderRadius='12px'
+            bg='red.500'
+            _hover={{ opacity: '0.8' }}
+            _active={{ opacity: '0.9' }}
+            me={{ base: 'none', lg: '20px' }}
+            leftIcon={<Icon color='white' as={FaTrash} me='6px' />}>
+            <Text fontSize='xs' color='#fff' fontWeight='bold'>
+              ELIMINAR
+            </Text>
+          </Button>
+        </Flex>
       </Td>
     </Tr>
   );

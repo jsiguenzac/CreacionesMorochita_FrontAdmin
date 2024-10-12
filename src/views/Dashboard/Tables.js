@@ -89,7 +89,7 @@ function Tables() {
         </CardBody>
       </Card>
       {/* Projects Table */}
-      <Card my='22px' overflowX={{ sm: "scroll", xl: "hidden" }} pb='0px'>
+      {/* <Card my='22px' overflowX={{ sm: "scroll", xl: "hidden" }} pb='0px'>
         <CardHeader p='6px 0px 22px 0px'>
           <Flex direction='column'>
             <Text fontSize='lg' color='#fff' fontWeight='bold' mb='.5rem'>
@@ -160,7 +160,7 @@ function Tables() {
             </Tbody>
           </Table>
         </CardBody>
-      </Card>
+      </Card> */}
     </Flex>
   );
 }

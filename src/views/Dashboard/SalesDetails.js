@@ -22,19 +22,19 @@ import TablesProjectRow from "components/Tables/TablesProjectRow";
 import TablesTableRow from "components/Tables/TablesTableRow";
 
 // Data
-import { tablesProjectData, tablesTableData } from "variables/general";
+import { tablesProjectDataClient, tablesTableData } from "variables/general";
 
 // Icons
 import { AiFillCheckCircle } from "react-icons/ai";
 
-function Sales() {
+function SalesDetails() {
   return (
     <Flex direction='column' pt={{ base: "120px", md: "75px" }}>
-      {/* Authors Table */}
+      
       <Card overflowX={{ sm: "scroll", xl: "hidden" }} pb='0px'>
         <CardHeader p='6px 0px 22px 0px'>
           <Text fontSize='lg' color='#fff' fontWeight='bold'>
-            Authors Table
+            Detalle de Venta
           </Text>
         </CardHeader>
         <CardBody>
@@ -89,7 +89,7 @@ function Sales() {
         </CardBody>
       </Card>
       {/* Projects Table */}
-      <Card my='22px' overflowX={{ sm: "scroll", xl: "hidden" }} pb='0px'>
+      {/* <Card my='22px' overflowX={{ sm: "scroll", xl: "hidden" }} pb='0px'>
         <CardHeader p='6px 0px 22px 0px'>
           <Flex direction='column'>
             <Text fontSize='lg' color='#fff' fontWeight='bold' mb='.5rem'>
@@ -145,7 +145,7 @@ function Sales() {
               </Tr>
             </Thead>
             <Tbody>
-              {tablesProjectData.map((row, index, arr) => {
+              {tablesProjectDataClient.map((row, index, arr) => {
                 return (
                   <TablesProjectRow
                     name={row.name}
@@ -160,9 +160,9 @@ function Sales() {
             </Tbody>
           </Table>
         </CardBody>
-      </Card>
+      </Card> */}
     </Flex>
   );
 }
 
-export default Sales;
+export default SalesDetails;

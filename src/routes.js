@@ -1,10 +1,11 @@
 // import
 import Dashboard from "views/Dashboard/Dashboard.js";
 import Tables from "views/Dashboard/Tables.js";
-import Sales from "views/Dashboard/Sales.js";
+import SalesV2 from "views/Dashboard/SalesV2.js";
+import SalesDetails from "views/Dashboard/SalesDetails.js";
 import Users from "views/Dashboard/Users.js";
 import Client from "views/Dashboard/Client.js";
-import Billing from "views/Dashboard/Billing.js";
+import Inventory from "views/Dashboard/Inventory.js";
 import RTLPage from "views/RTL/RTLPage.js";
 import Profile from "views/Dashboard/Profile.js";
 import SignIn from "views/Pages/SignIn.js";
@@ -23,6 +24,16 @@ import {
   GlobeIcon,
   CartIcon
 } from "components/Icons/Icons";
+import { FaSignOutAlt } from "react-icons/fa";
+
+export const pagesRoutes = [
+  {
+    path: "/ventas/detalle",
+    name: "Detalle de Venta",
+    component: SalesDetails,
+    layout: "/admin",
+  }
+];
 
 var dashRoutes = [
   {
@@ -34,23 +45,23 @@ var dashRoutes = [
     layout: "/admin",
   },
   {
-    path: "/ventas",
+    path: "/sales",
     name: "Ventas",
     rtlName: "لوحة القيادة",
     icon: <CartIcon color='inherit' />,
-    component: Sales,
+    component: SalesV2,
     layout: "/admin",
   },
   {
-    path: "/billing",
+    path: "/inventory",
     name: "Inventario",
     rtlName: "لوحة القيادة",
     icon: <CreditIcon color='inherit' />,
-    component: Billing,
+    component: Inventory,
     layout: "/admin",
   },
   {
-    path: "/usuarios",
+    path: "/users",
     name: "Usuarios",
     rtlName: "لوحة القيادة",
     icon: <GlobeIcon color='inherit' />,
@@ -58,7 +69,7 @@ var dashRoutes = [
     layout: "/admin",
   },
   {
-    path: "/clientes",
+    path: "/clients",
     name: "Clientes",
     rtlName: "لوحة القيادة",
     icon: <GlobeIcon color='inherit' />,
@@ -92,7 +103,7 @@ var dashRoutes = [
         path: "/login",
         name: "Cerrar Sesión",
         rtlName: "لوحة القيادة",
-        icon: <LogoutIcon color='inherit' />,
+        icon: <FaSignOutAlt color='inherit' />,
         component: SignIn,
         layout: "/auth",
       },

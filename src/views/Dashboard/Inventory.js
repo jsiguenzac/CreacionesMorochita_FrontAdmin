@@ -12,28 +12,43 @@ import {
   Button,
   FormControl,
   Input,
+  FormLabel,
+  Select,
+  InputGroup,
+  InputRightElement,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
   Tr,
 } from "@chakra-ui/react";
 
+import { ChevronDownIcon, CalendarIcon } from "@chakra-ui/icons";
 // Custom components
 import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 
 // Table Components
-import TablesProjectRow from "components/Tables/TablesProjectRow";
+import TableRowInventory from "components/Tables/TablesProjectRowInventory";
 import TablesTableRow from "components/Tables/TablesTableRow";
 
 // Data
-import { tablesProjectDataClient, tablesTableData } from "variables/general";
+import { tablesProjectDataInventory, tablesTableData } from "variables/general";
 
 // Icons
 import { AiFillCheckCircle } from "react-icons/ai";
 
-function Client() {
+function Inventory() {
 
+  const now = new Date();
+  now.setHours(now.getHours() - 5);
+  const today = now.toISOString().split("T")[0];
+  
   const [filters, setFilters] = useState({
     name: "",
+    role: "",
+    creationDate: "",
   });
 
   const handleInputChange = (e) => {
@@ -52,9 +67,12 @@ function Client() {
   const handleClearFilters = () => {
     setFilters({
       name: "",
+      role: "",
+      creationDate: "",
     });
   };
-  
+
+
   return (
     <Flex direction='column' pt={{ base: "120px", md: "75px" }}>
       {/* Filtros */}
@@ -62,23 +80,23 @@ function Client() {
         <CardHeader p="6px 0px 22px 0px">
         <Flex direction={{ base: "column", md: "row" }} gap="20px">
           <Text fontSize="lg" color="#fff" fontWeight="bold">
-            Filtrar Clientes
+            Filtros
           </Text>
-        </Flex>        
+        </Flex>
         <Button
           marginLeft={{ base: "50px", md: "auto" }}
-          colorScheme="blue"
+          colorScheme="blue" 
           onClick={() => handleOpenModal()}>
-          Nuevo Cliente
+            Agregar Producto
           </Button>
         </CardHeader>
         <CardBody>
           <Flex direction={{ base: "column", md: "row" }} gap="20px">
             <FormControl>
-              {/* <FormLabel color="gray.400">Nombre</FormLabel> */}
+              <FormLabel color="gray.400">Nombre</FormLabel>
               <Input
                 name="name"
-                width={{ base: "100%", md: "100%" }}
+                width={{ base: "100%", md: "180px" }}
                 placeholder="Buscar por nombre"
                 value={filters.name}
                 onChange={handleInputChange}
@@ -86,10 +104,104 @@ function Client() {
                 borderColor="gray.600"
               />
             </FormControl>
+            <FormControl>
+              <FormLabel color="gray.400">Categoria</FormLabel>
+              {/* <Select
+                name="role"
+                placeholder="Seleccionar rol"
+                value={filters.role}
+                onChange={handleInputChange}
+                color="#fff"
+                borderColor="gray.600"
+                _focus={{ bg: "gray.800" }}
+                _expanded={{ bg: "gray.800" }}
+              >
+                <option value="admin">Admin</option>
+                <option value="user">Usuario</option>
+                <option value="guest">Invitado</option>
+              </Select> */}
+              <Menu>
+                <MenuButton
+                  width={{ base: "100%", md: "220px" }}
+                  border="1px solid #4B5563"
+                  as={Button}
+                  rightIcon={<ChevronDownIcon color={filters.role ? "white" : "gray.200"} />}
+                  bg="none" 
+                  bord color={!filters.role ? "gray.500" : "white" } 
+                  _hover={{ bg: "none", borderColor: "gray.300" }}
+                  _active={{ bg: "none", borderColor: "white" }}
+                >
+                  {filters.role || "Seleccionar categoria"}
+                </MenuButton>
+                <MenuList bg="gray.700" color="white">
+                  <MenuItem
+                    onClick={() => setFilters({ ...filters, role: "Pantalones" })}
+                    _hover={{ bg: "purple.500" }}
+                    _focus={{ bg: "purple.500" }}
+                  >
+                    Pantalones
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => setFilters({ ...filters, role: "Polos" })}
+                    _hover={{ bg: "purple.500" }}
+                    _focus={{ bg: "purple.500" }}
+                  >
+                    Polos
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => setFilters({ ...filters, role: "Cafarenas" })}
+                    _hover={{ bg: "purple.500" }}
+                    _focus={{ bg: "purple.500" }}
+                  >
+                    Cafarenas
+                  </MenuItem>
+                  {/* <MenuItem
+                    onClick={() => setFilters({ ...filters, role: "Proveedor" })}
+                    _hover={{ bg: "purple.500" }}
+                    _focus={{ bg: "purple.500" }}
+                  >
+                    Proveedor
+                  </MenuItem> */}
+                </MenuList>
+              </Menu>
+            </FormControl>
+            <FormControl>
+              <FormLabel color="gray.400">Fecha de Registro</FormLabel>
+              {/* <Input
+                type="date"
+                name="creationDate"
+                value={filters.creationDate}
+                onChange={handleInputChange}
+                color="#fff"
+                borderColor="gray.600"
+                max={today}
+              /> */}
+              <InputGroup
+                width={{ base: "100%", md: "auto" }}
+              >
+                <InputRightElement pointerEvents="none">
+                  <CalendarIcon 
+                    color="gray.400"
+                    marginRight="55px"
+                  />
+                </InputRightElement>
+                <Input
+                  type="date"
+                  pl="10px"
+                  name="creationDate"
+                  value={filters.creationDate}
+                  onChange={handleInputChange}
+                  color="#fff"
+                  borderColor="gray.600"
+                  max={today}
+                />
+              </InputGroup>
+            </FormControl>
           </Flex>
           {/* Flex for the buttons */}
           <Flex
-            marginStart={{ base: "0px", md: "10px" }}
+            mt="30px"
+            marginStart={{ base: "0px", md: "20px" }}
             justifyContent="flex-end"
             gap="10px"
             direction={{ base: "column", md: "row" }}
@@ -115,7 +227,7 @@ function Client() {
               Limpiar
             </Button>
             <Flex
-              marginStart={{ base: "0px", md: "500px" }}
+              marginStart={{ base: "0px", md: "50px", lg: "50px" }}
               justifyContent="flex-end"
               gap="10px"
               direction={{ base: "column", md: "row" }}
@@ -150,10 +262,10 @@ function Client() {
       </Card>
       {/* Clients Table */}
       <Card my='22px' overflowX={{ sm: "scroll", xl: "hidden" }} pb='0px'>
-        {/* <CardHeader p='6px 0px 22px 0px'>
+        <CardHeader p='6px 0px 22px 0px'>
           <Flex direction='column'>
             <Text fontSize='lg' color='#fff' fontWeight='bold' mb='.5rem'>
-              Clientes
+              Inventario de Productos
             </Text>
             <Flex align='center'>
               <Icon
@@ -167,11 +279,11 @@ function Client() {
                 <Text fontWeight='bold' as='span' color='gray.400'>
                   +30%
                 </Text>{" "}
-                this month
+                este mes
               </Text>
-            </Flex> 
+            </Flex>
           </Flex>
-        </CardHeader> */}
+        </CardHeader>
         <CardBody>
           <Table variant='simple' color='#fff'>
             <Thead>
@@ -181,61 +293,44 @@ function Client() {
                   color='gray.400'
                   fontFamily='Plus Jakarta Display'
                   borderBottomColor='#56577A'>
-                  Nombre Completo
-                </Th>
-                <Th
-                  ps='0px'
-                  color='gray.400'
-                  fontFamily='Plus Jakarta Display'
-                  borderBottomColor='#56577A'>
-                  DNI
-                </Th>
-                <Th
-                  ps='0px'
-                  color='gray.400'
-                  fontFamily='Plus Jakarta Display'
-                  borderBottomColor='#56577A'>
-                  Celular
-                </Th>
-                <Th
-                  ps='0px'
-                  color='gray.400'
-                  fontFamily='Plus Jakarta Display'
-                  borderBottomColor='#56577A'>
-                  Correo Electrónico
+                  Nombre del Producto
                 </Th>
                 <Th
                   color='gray.400'
                   fontFamily='Plus Jakarta Display'
                   borderBottomColor='#56577A'>
-                  Monto total del mes
+                  Precio Unitario
                 </Th>
-                {/* <Th
+                <Th
                   color='gray.400'
                   fontFamily='Plus Jakarta Display'
                   borderBottomColor='#56577A'>
-                  Estado
-                </Th> */}
-                {/* <Th
+                  Stock
+                </Th>
+                <Th
                   color='gray.400'
                   fontFamily='Plus Jakarta Display'
                   borderBottomColor='#56577A'>
-                  % de Comparación
-                </Th> */}
+                  Categoria
+                </Th>
+                <Th
+                  color='gray.400'
+                  fontFamily='Plus Jakarta Display'
+                  borderBottomColor='#56577A'>
+                  % de Venta Mensual
+                </Th>
                 <Th borderBottomColor='#56577A'></Th>
               </Tr>
             </Thead>
             <Tbody>
-              {tablesProjectDataClient.map((row, index, arr) => {
+              {tablesProjectDataInventory.map((row, index, arr) => {
                 return (
-                  <TablesProjectRow
+                  <TableRowInventory
                     name={row.name}
                     logo={row.logo}
-                    /* status={row.status} */
-                    email={row.email}
-                    dni={row.dni}
-                    phone={row.phone}
+                    status={row.status}
                     budget={row.budget}
+                    category={row.category}
                     progression={row.progression}
                     lastItem={index === arr.length - 1 ? true : false}
                   />
@@ -249,4 +344,4 @@ function Client() {
   );
 }
 
-export default Client;
+export default Inventory;

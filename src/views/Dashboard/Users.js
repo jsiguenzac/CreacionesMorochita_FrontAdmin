@@ -12,10 +12,19 @@ import {
   Tr,
   Input,
   Select,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
   Button,
   FormControl,
-  FormLabel
+  FormLabel,
+  InputGroup, 
+  InputRightElement,
 } from "@chakra-ui/react";
+import ReactDatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { ChevronDownIcon, CalendarIcon } from "@chakra-ui/icons";
 
 // Custom components
 import Card from "components/Card/Card.js";
@@ -27,7 +36,7 @@ import TablesProjectRow from "components/Tables/TablesProjectRow";
 import TablesTableRow from "components/Tables/TablesTableRow";
 
 // Data
-import { tablesProjectData, tablesTableData } from "variables/general";
+import { tablesTableData } from "variables/general";
 import ModalUserForm from "../components/users/ModalUserForm";
 
 // Icons
@@ -45,11 +54,14 @@ function Users() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setEditingUser(null); // Limpia el usuario en edición cuando cierras el modal
+    setEditingUser(null);
   };
 
-  const today = new Date().toISOString().split("T")[0];
-
+  // const today = new Date().toISOString().split("T")[0];
+  const now = new Date();
+  now.setHours(now.getHours() - 5);
+  const today = now.toISOString().split("T")[0];
+  
   const [filters, setFilters] = useState({
     name: "",
     role: "",
@@ -86,10 +98,13 @@ function Users() {
           <Text fontSize="lg" color="#fff" fontWeight="bold">
             Filtrar Usuarios
           </Text>
-          <Button colorScheme="blue" onClick={() => handleOpenModal()}>
+        </Flex>
+        <Button
+          marginLeft={{ base: "50px", md: "auto" }}
+          colorScheme="blue" 
+          onClick={() => handleOpenModal()}>
             Agregar Usuario
           </Button>
-        </Flex>
         </CardHeader>
         <CardBody>
           <Flex direction={{ base: "column", md: "row" }} gap="20px">
@@ -97,6 +112,7 @@ function Users() {
               <FormLabel color="gray.400">Nombre</FormLabel>
               <Input
                 name="name"
+                width={{ base: "100%", md: "180px" }}
                 placeholder="Buscar por nombre"
                 value={filters.name}
                 onChange={handleInputChange}
@@ -106,22 +122,68 @@ function Users() {
             </FormControl>
             <FormControl>
               <FormLabel color="gray.400">Rol</FormLabel>
-              <Select
+              {/* <Select
                 name="role"
                 placeholder="Seleccionar rol"
                 value={filters.role}
                 onChange={handleInputChange}
                 color="#fff"
                 borderColor="gray.600"
+                _focus={{ bg: "gray.800" }}
+                _expanded={{ bg: "gray.800" }}
               >
                 <option value="admin">Admin</option>
                 <option value="user">Usuario</option>
                 <option value="guest">Invitado</option>
-              </Select>
+              </Select> */}
+              <Menu>
+                <MenuButton
+                  width={{ base: "100%", md: "170px" }}
+                  border="1px solid #4B5563"
+                  as={Button}
+                  rightIcon={<ChevronDownIcon color={filters.role ? "white" : "gray.200"} />}
+                  bg="none" 
+                  bord color={!filters.role ? "gray.500" : "white" } 
+                  _hover={{ bg: "none", borderColor: "gray.300" }}
+                  _active={{ bg: "none", borderColor: "white" }}
+                >
+                  {filters.role || "Seleccionar rol"}
+                </MenuButton>
+                <MenuList bg="gray.700" color="white">
+                  <MenuItem
+                    onClick={() => setFilters({ ...filters, role: "Administrador" })}
+                    _hover={{ bg: "purple.500" }}
+                    _focus={{ bg: "purple.500" }}
+                  >
+                    Administrador
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => setFilters({ ...filters, role: "Vendedor" })}
+                    _hover={{ bg: "purple.500" }}
+                    _focus={{ bg: "purple.500" }}
+                  >
+                    Vendedor
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => setFilters({ ...filters, role: "Supervisor" })}
+                    _hover={{ bg: "purple.500" }}
+                    _focus={{ bg: "purple.500" }}
+                  >
+                    Supervisor
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => setFilters({ ...filters, role: "Proveedor" })}
+                    _hover={{ bg: "purple.500" }}
+                    _focus={{ bg: "purple.500" }}
+                  >
+                    Proveedor
+                  </MenuItem>
+                </MenuList>
+              </Menu>
             </FormControl>
             <FormControl>
               <FormLabel color="gray.400">Fecha de Creación</FormLabel>
-              <Input
+              {/* <Input
                 type="date"
                 name="creationDate"
                 value={filters.creationDate}
@@ -129,13 +191,33 @@ function Users() {
                 color="#fff"
                 borderColor="gray.600"
                 max={today}
-              />
+              /> */}
+              <InputGroup
+                width={{ base: "100%", md: "auto" }}
+              >
+                <InputRightElement pointerEvents="none">
+                  <CalendarIcon 
+                    color="gray.400"
+                    marginRight="55px"
+                  />
+                </InputRightElement>
+                <Input
+                  type="date"
+                  pl="10px"
+                  name="creationDate"
+                  value={filters.creationDate}
+                  onChange={handleInputChange}
+                  color="#fff"
+                  borderColor="gray.600"
+                  max={today}
+                />
+              </InputGroup>
             </FormControl>
           </Flex>
           {/* Flex for the buttons */}
           <Flex
             mt="30px"
-            marginStart={{ base: "0px", md: "50px" }}
+            marginStart={{ base: "0px", md: "20px" }}
             justifyContent="flex-end"
             gap="10px"
             direction={{ base: "column", md: "row" }}
@@ -161,7 +243,7 @@ function Users() {
               Limpiar
             </Button>
             <Flex
-              marginStart={{ base: "0px", md: "50px" }}
+              marginStart={{ base: "0px", md: "50px", lg: "50px" }}
               justifyContent="flex-end"
               gap="10px"
               direction={{ base: "column", md: "row" }}
@@ -169,7 +251,7 @@ function Users() {
               <Button
                 _hover={{ bg: "purple.500" }}
                 bg={"brand.200"}
-                disabled={Object.values(filters).every((filter) => filter === "")}
+                /* disabled={Object.values(filters).every((filter) => filter === "")} */
                 /* onClick={handleClearFilters} */
                 width={{ base: "70px", md: "70px" }}
                 marginLeft={{ base: "30px", md: "50px" }}

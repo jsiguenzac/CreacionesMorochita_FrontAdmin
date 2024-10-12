@@ -11,8 +11,8 @@ import {
 } from "@chakra-ui/react";
 import { FaPencilAlt, FaWhatsapp, FaUserCircle, FaRegFileExcel } from 'react-icons/fa';
 
-function DashboardTableRow(props) {
-  const { logo, name, status, budget, dni, email, phone, progression, lastItem } = props;
+function TableRowInventory(props) {
+  const { logo, name, status, budget, category, progression, lastItem } = props;
   const textColor = useColorModeValue("gray.700", "white");
   return (
     <Tr>
@@ -29,44 +29,21 @@ function DashboardTableRow(props) {
         </Flex>
       </Td>
       <Td borderBottomColor='#56577A' border={lastItem ? "none" : null}>
-        <Flex alignItems='center' textAlign={"center"} py='.8rem' minWidth='100%' flexWrap='nowrap'>
-          <Text fontSize='sm' textAlign={"center"} color='#fff' pb='.5rem'  >
-            {dni}
-          </Text>
-        </Flex>
-      </Td>
-      <Td borderBottomColor='#56577A' border={lastItem ? "none" : null}>
-        <Text fontSize='sm' textAlign={"center"} color='#fff' pb='.5rem'>
-          {phone}
-        </Text>
-      </Td>
-      <Td borderBottomColor='#56577A' border={lastItem ? "none" : null}>
-        <Text fontSize='sm' color='#fff' pb='.5rem'>
-          {email}
-        </Text>
-      </Td>
-      {/* <Td borderBottomColor='#56577A' border={lastItem ? "none" : null}>
         <Text fontSize='sm' color='#fff' fontWeight='bold' pb='.5rem'>
           {budget}
         </Text>
-      </Td> */}
-      <Td
-        minWidth={{ sm: "250px" }}
-        ps='0px'
-        borderBottomColor='#56577A'
-        border={lastItem ? "none" : null}>
-        <Flex alignItems='center' textAlign={"center"} py='.8rem' minWidth='100%' >
-          <Text fontSize='sm' color='#fff' fontWeight='bold' minWidth='100%'>
-          {budget}
-          </Text>
-        </Flex>
       </Td>
-      {/* <Td borderBottomColor='#56577A' border={lastItem ? "none" : null}>
-        <Text fontSize='sm' color='#fff' pb='.5rem'>
-          {status ? 'Activo' : 'Inactivo'}
+      <Td borderBottomColor='#56577A' border={lastItem ? "none" : null}>
+        <Text fontSize='sm' color='#fff' fontWeight='bold' pb='.5rem'>
+          {status}
         </Text>
-      </Td> */}
-     {/* <Td borderBottomColor='#56577A' border={lastItem ? "none" : null}>
+      </Td>
+      <Td borderBottomColor='#56577A' border={lastItem ? "none" : null}>
+        <Text fontSize='sm' color='#fff' fontWeight='bold' pb='.5rem'>
+          {category}
+        </Text>
+      </Td>
+      <Td borderBottomColor='#56577A' border={lastItem ? "none" : null}>
         <Flex direction='column'>
           <Text
             fontSize='sm'
@@ -82,7 +59,7 @@ function DashboardTableRow(props) {
             borderRadius='15px'
           />
         </Flex>
-      </Td> */}
+      </Td>
       <Td borderBottomColor='#56577A' border={lastItem ? "none" : null}>
       <Flex direction={{ base: "column", md: "row" }} gap="20px">
         <Button
@@ -97,23 +74,10 @@ function DashboardTableRow(props) {
             EDITAR
           </Text>
         </Button>
-        <Button
-          /* onClick={onOpenEdit} */
-          borderRadius='12px'
-          bg='blue.500'
-          _hover={{ opacity: '0.8' }}
-          _active={{ opacity: '0.9' }}
-          me={{ base: 'none', lg: 'auto' }}
-          width={{ base: '100px', md: 'auto' }}
-          leftIcon={<Icon color='white' as={FaRegFileExcel} />}>
-          {/* <Text fontSize='xs' color='#fff' fontWeight='bold'>
-            {''}
-          </Text> */}
-        </Button>
       </Flex>
       </Td>
     </Tr>
   );
 }
 
-export default DashboardTableRow;
+export default TableRowInventory;
