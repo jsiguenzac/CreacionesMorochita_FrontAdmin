@@ -17,16 +17,7 @@ import {
 	useDisclosure
 } from '@chakra-ui/react';
 import avatar11 from 'assets/img/avatars/avatar11.png';
-// Images
-/* import avatar2 from 'assets/img/avatars/avatar2.png';
-import avatar3 from 'assets/img/avatars/avatar3.png';
-import avatar4 from 'assets/img/avatars/avatar4.png';
-import avatar6 from 'assets/img/avatars/avatar6.png';
-import bgProfile from 'assets/img/bgProfile.png';
-import ProjectImage1 from 'assets/img/ProjectImage1.png';
-import ProjectImage2 from 'assets/img/ProjectImage2.png';
-import ProjectImage3 from 'assets/img/ProjectImage3.png';
- */
+
 // Custom components
 import Card from 'components/Card/Card';
 import CardBody from 'components/Card/CardBody';
@@ -48,8 +39,8 @@ import {
 	lineChartOptionsProfile2
 } from 'variables/charts';
 import { React, useState, useEffect } from 'react';
+import { CustomModal } from 'components/Modal/ModalMessage';
 import { DetailUser } from 'services/Profile/DetailUser';
-import { CustomModal } from "components/Modal/ModalMessage";
 import DotSpin from 'components/utils/BounciLoader';
 
 import { EditProfileButton } from '../components/profile/EditProfileButton';
@@ -59,16 +50,18 @@ export default function Profile() {
     const [loading, setLoading] = useState(false);
     const [err, setErr] = useState("");
     const [dataUser, setDataUser] = useState(null);
-
+	
     const user = getUser();
-
-    const { isOpen, onOpen, onClose } = useDisclosure();	
+	
     const { isOpen: isOpenEdit, onOpen: onOpenEdit, onClose: onCloseEdit } = useDisclosure();
 	const { isOpen: isOpenChangePassword, onOpen: onOpenChangePassword, onClose: onCloseChangePassword } = useDisclosure();
+	const { isOpen: isOpenErr, onOpen: onOpenErr, onClose: onCloseErr } = useDisclosure();
 
-    if (!user) {
-        return null;
-    }
+	const handleShowModalErr = () => {
+		if (err) {
+			onOpenErr();
+		}
+	};
 
     const handleDataUser = async () => {
         setLoading(true);
@@ -81,22 +74,32 @@ export default function Profile() {
                 setDataUser(data);
             } else if (msg === "USUARIO_NO_ENCONTRADO" || msg === "USUARIO_INACTIVO") {
 				clearAllStorage();
-                setErr("Error al obtener datos del usuario");
+                setErr("Usuario no encontrado o inactivo");
+				handleShowModalErr();
             } else {
-                console.error("Error al obtener datos del usuario", msg);
+                clearAllStorage();
+                setErr("Error al obtener datos del usuario");
+				handleShowModalErr();
             }
         } catch (error) {
-            console.error("Error al obtener datos del usuario", error);
+            console.error("Error al obtener datos del usuario: ", error);
             setErr("Error al obtener datos del usuario");
+			handleShowModalErr();
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
+		console.log("user: ", user);
+		console.log("dataUser: ", dataUser);
+		console.log("err: ", err);
         if (user && !dataUser) {
             handleDataUser();
         }
+		if (onCloseErr) {
+			setErr("");
+		}
     }, []);
 
 	// Creamos una constante con los datos a editar
@@ -108,7 +111,14 @@ export default function Profile() {
 		email: dataUser.email,
 		phone: dataUser.phone
     } : {};
-
+	
+    if (!user) {
+        return (
+		<Flex direction='column' mt={{ sm: '25px', md: '0px' }}>
+			<Text color="red.500">No se encontró el usuario.</Text>
+		</Flex>
+		);
+    }
 	return (
 		<Flex direction='column' mt={{ sm: '25px', md: '0px' }}>
 			<Box
@@ -420,7 +430,12 @@ export default function Profile() {
 					</CardBody>
 				</Card>
 			</Flex>
-
+			<CustomModal
+				header="Upss!"
+				message={err || "Ocurrió un error al obtener los datos del usuario"}
+				isOpen={isOpenErr}
+				onClose={onCloseErr}
+			/>
 			{loading && <DotSpin message="Cargando Perfil..." />}
 		</Flex>
 	);
