@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 // Chakra imports
 import {
@@ -21,6 +21,7 @@ import {
   FormLabel,
   InputGroup, 
   InputRightElement,
+  useDisclosure,
 } from "@chakra-ui/react";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -39,12 +40,28 @@ import TablesTableRow from "components/Tables/TablesTableRow";
 import { tablesTableData } from "variables/general";
 import ModalUserForm from "../components/users/ModalUserForm";
 
-// Icons
-// import { AiFillCheckCircle } from "react-icons/ai";
+import { dateToTimestamp } from "components/utils/Methods";
+import { RolLisService } from "services/Users/RolService";
+import { UserListService } from "services/Users/UserService";
+import DotSpin from "components/utils/BounciLoader";
+import { CustomModal } from "components/Modal/ModalMessage";
 
 function Users() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [roles, setRoles] = useState([]);
+  const [listUsers, setListUsers] = useState([]);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [usersPerPage, setUsersPerPage] = useState(10);
+  const [idRol, setIdRol] = useState(0);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [applyFiltersFlag, setApplyFiltersFlag] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [err, setErr] = useState("");
+
+  const { isOpen: isOpenErr, onOpen: onOpenErr, onClose: onCloseErr } = useDisclosure();
+
 
   // Función para abrir el modal y definir si es para agregar o editar usuario
   const handleOpenModal = (user = null) => {
@@ -76,9 +93,50 @@ function Users() {
     });
   };
 
-  const handleApplyFilters = () => {
+  const handleIncrementPage = () => {
+    setPage(page + 1);
+    setApplyFiltersFlag(true);
+  };
+
+  const handleDecrementPage = () => {
+    if (page === 1) return;
+    setPage(page - 1);
+    setApplyFiltersFlag(true);
+  };
+  
+  const handleApplyFilters = async () => {
+    const ts = dateToTimestamp(filters.creationDate);
     // Lógica para aplicar los filtros
-    console.log("Filtros aplicados:", filters);
+    const form = {
+      page: page,
+      name: filters.name,
+      idRol: idRol,
+      dateCreation: ts,
+    };
+    setLoading(true);
+    setMsg("Cargando usuarios...");
+    try {
+      const { data, msg } = await UserListService(form);
+      if (data) {
+        setListUsers(data.users);
+        setTotalUsers(data.total);
+        setUsersPerPage(data.page_size);
+      }
+      else {
+        console.log("Error al obtener la lista de usuarios:", msg);
+        setErr("Error al obtener los usuarios");
+        onOpenErr();
+      }
+    }
+    catch (error) {
+      console.error("Error al obtener la lista de usuarios:", error);
+      setErr("Error al obtener los usuarios");
+      onOpenErr();
+    }
+    finally {
+      setLoading(false);
+      setMsg("");
+    }
   };
 
   const handleClearFilters = () => {
@@ -87,7 +145,51 @@ function Users() {
       role: "",
       creationDate: "",
     });
+    setIdRol(0);
+    setPage(1);
+    setApplyFiltersFlag(true);
   };
+
+  useEffect(() => {
+    if (applyFiltersFlag) {
+      handleApplyFilters();
+      setApplyFiltersFlag(false);
+    }
+  }, [applyFiltersFlag]);
+
+  const handleRolesList = async () => {
+    setLoading(true);
+    setMsg("Cargando roles...");
+    try {
+      const { data, msg } = await RolLisService();
+      if (data) {
+        setRoles(data);
+      }
+      else {
+        console.log("Error al obtener la lista de roles:", msg);
+        setErr("Error al obtener los roles");
+        onOpenErr();
+      }
+    }
+    catch (error) {
+      console.error("Error al obtener la lista de roles:", error);
+      setErr("Error al obtener los roles");
+      onOpenErr();
+    }
+    finally {
+      setLoading(false);
+      setMsg("");
+    }
+  }
+
+  useEffect(() => {
+    // llamada de servicios al cargar la vista
+    handleRolesList();
+    handleApplyFilters();
+		if (onCloseErr) {
+			setErr("");
+		}
+  }, []);
 
   return (
     <Flex direction="column" pt={{ base: "120px", md: "75px" }}>
@@ -122,23 +224,9 @@ function Users() {
             </FormControl>
             <FormControl>
               <FormLabel color="gray.400">Rol</FormLabel>
-              {/* <Select
-                name="role"
-                placeholder="Seleccionar rol"
-                value={filters.role}
-                onChange={handleInputChange}
-                color="#fff"
-                borderColor="gray.600"
-                _focus={{ bg: "gray.800" }}
-                _expanded={{ bg: "gray.800" }}
-              >
-                <option value="admin">Admin</option>
-                <option value="user">Usuario</option>
-                <option value="guest">Invitado</option>
-              </Select> */}
               <Menu>
                 <MenuButton
-                  width={{ base: "100%", md: "170px" }}
+                  width={{ base: "100%", md: "220px" }}
                   border="1px solid #4B5563"
                   as={Button}
                   rightIcon={<ChevronDownIcon color={filters.role ? "white" : "gray.200"} />}
@@ -149,49 +237,29 @@ function Users() {
                 >
                   {filters.role || "Seleccionar rol"}
                 </MenuButton>
-                <MenuList bg="gray.700" color="white">
-                  <MenuItem
-                    onClick={() => setFilters({ ...filters, role: "Administrador" })}
-                    _hover={{ bg: "purple.500" }}
-                    _focus={{ bg: "purple.500" }}
-                  >
-                    Administrador
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => setFilters({ ...filters, role: "Vendedor" })}
-                    _hover={{ bg: "purple.500" }}
-                    _focus={{ bg: "purple.500" }}
-                  >
-                    Vendedor
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => setFilters({ ...filters, role: "Supervisor" })}
-                    _hover={{ bg: "purple.500" }}
-                    _focus={{ bg: "purple.500" }}
-                  >
-                    Supervisor
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => setFilters({ ...filters, role: "Proveedor" })}
-                    _hover={{ bg: "purple.500" }}
-                    _focus={{ bg: "purple.500" }}
-                  >
-                    Proveedor
-                  </MenuItem>
+                <MenuList bg="gray.700" color="white" size="12px">
+                  {roles
+                    .filter((rol) => rol.id !== 5)
+                    .map((rol) => (
+                    <MenuItem
+                      size="12px"
+                      key={rol.id}
+                      onClick={() => {
+                        setFilters((prevFilters) => ({ ...prevFilters, role: rol.name }));
+                        setIdRol(rol.id);
+                      }}
+                      /* onClick={() => setFilters({ ...filters, role: rol.name })} */
+                      _hover={{ bg: "purple.500" }}
+                      _focus={{ bg: "purple.500" }}
+                    >
+                      {rol.name}
+                    </MenuItem>
+                  ))}
                 </MenuList>
               </Menu>
             </FormControl>
             <FormControl>
               <FormLabel color="gray.400">Fecha de Creación</FormLabel>
-              {/* <Input
-                type="date"
-                name="creationDate"
-                value={filters.creationDate}
-                onChange={handleInputChange}
-                color="#fff"
-                borderColor="gray.600"
-                max={today}
-              /> */}
               <InputGroup
                 width={{ base: "100%", md: "auto" }}
               >
@@ -235,7 +303,7 @@ function Users() {
             <Button
               _hover={{ bg: "white" }}
               bg={"gray.300"}
-              disabled={Object.values(filters).every((filter) => filter === "")}
+              disabled={Object.values(filters).every((filter) => filter === "") && page === 1}
               onClick={handleClearFilters}
               width={{ base: "100px", md: "auto" }}
               marginLeft={{ base: "30px", md: "0px" }}
@@ -249,10 +317,10 @@ function Users() {
               direction={{ base: "column", md: "row" }}
             >
               <Button
-                _hover={{ bg: "purple.500" }}
-                bg={"brand.200"}
-                /* disabled={Object.values(filters).every((filter) => filter === "")} */
-                /* onClick={handleClearFilters} */
+                _hover={{ bg: page === 1 ? "gray.400" : "purple.500" }}
+                bg={page === 1 ? "gray.300" : "brand.200"}
+                disabled={page === 1}
+                onClick={handleDecrementPage}
                 width={{ base: "70px", md: "70px" }}
                 marginLeft={{ base: "30px", md: "50px" }}
               >
@@ -261,10 +329,10 @@ function Users() {
                 </Text>
               </Button>
               <Button 
-                _hover={{ bg: "purple.500" }}
-                bg={"brand.200"}
-                /* disabled={Object.values(filters).every((filter) => filter === "")} */
-                /* onClick={handleClearFilters} */
+                _hover={{ bg: (page * usersPerPage) >= totalUsers ? "gray.400" : "purple.500" }}
+                bg={(page * usersPerPage) >= totalUsers ? "gray.300" : "brand.200"}
+                disabled={(page * usersPerPage) >= totalUsers}
+                onClick={handleIncrementPage}
                 width={{ base: "70px", md: "70px" }}
                 marginLeft={{ base: "30px", md: "0px" }}
               >
@@ -315,7 +383,7 @@ function Users() {
                   fontFamily="Plus Jakarta Display"
                   borderBottomColor="#56577A"
                 >
-                  Status
+                  Estado
                 </Th>
                 <Th
                   color="gray.400"
@@ -328,18 +396,25 @@ function Users() {
               </Tr>
             </Thead>
             <Tbody>
-              {tablesTableData.map((row, index, arr) => {
+              {listUsers.length === 0 ? (
+                <Tr>
+                  <Th colSpan="6" textAlign="center" color="gray.400">
+                    No se encontraron usuarios
+                  </Th>
+                </Tr>
+              ) :
+              listUsers.map((row, index, arr) => {
                 return (
                   <TablesTableRow
-                    key={index}
-                    name={row.name}
-                    logo={row.logo}
+                    key={row.id_user}
+                    name={row.name + " " + row.last_name}
+                    /* logo={row.logo} */
                     email={row.email}
                     dni={row.dni}
-                    subdomain={row.subdomain}
-                    domain={row.domain}
-                    status={row.status}
-                    date={row.date}
+                    /* subdomain={row.subdomain} */
+                    domain={row.name_rol.toLowerCase()}
+                    status={row.active}
+                    date={row.date_creation}
                     lastItem={index === arr.length - 1 ? true : false}
                     onEdit={() => handleOpenModal(row)}
                   />
@@ -355,6 +430,13 @@ function Users() {
         onSubmit={(data) => console.log("Guardando usuario:", data)}
         user={editingUser}
       />
+      <CustomModal
+				header="Upss!"
+				message={err}
+				isOpen={isOpenErr}
+				onClose={onCloseErr}
+			/>
+      {loading && <DotSpin message={msg} />}
     </Flex>
   );
 }

@@ -10,7 +10,7 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import React from "react";
-import { FaPencilAlt, FaTrash } from 'react-icons/fa';
+import { FaPencilAlt, FaTrash, FaBan, FaUserMinus, FaUserClock } from 'react-icons/fa';
 
 function TablesTableRow(props) {
   const {
@@ -128,13 +128,13 @@ function TablesTableRow(props) {
           <Button
             /* onClick={onOpenEdit} */
             borderRadius='12px'
-            bg='red.500'
+            bg={status ? 'red.500' : 'green.500'}
             _hover={{ opacity: '0.8' }}
             _active={{ opacity: '0.9' }}
             me={{ base: 'none', lg: '20px' }}
-            leftIcon={<Icon color='white' as={FaTrash} me='6px' />}>
+            leftIcon={<Icon color='white' as={status ? FaUserMinus : FaUserClock } me='6px' />}>
             <Text fontSize='xs' color='#fff' fontWeight='bold'>
-              ELIMINAR
+              {status ? 'INACTIVAR' : 'ACTIVAR'}
             </Text>
           </Button>
         </Flex>

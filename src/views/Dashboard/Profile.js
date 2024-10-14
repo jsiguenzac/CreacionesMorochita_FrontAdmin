@@ -91,9 +91,6 @@ export default function Profile() {
     };
 
     useEffect(() => {
-		console.log("user: ", user);
-		console.log("dataUser: ", dataUser);
-		console.log("err: ", err);
         if (user && !dataUser) {
             handleDataUser();
         }
