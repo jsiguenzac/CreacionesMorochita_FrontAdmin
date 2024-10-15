@@ -22,6 +22,8 @@ import {
   InputGroup, 
   InputRightElement,
   useDisclosure,
+  filter,
+  useToast,
 } from "@chakra-ui/react";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -42,7 +44,7 @@ import ModalUserForm from "../components/users/ModalUserForm";
 
 import { dateToTimestamp } from "components/utils/Methods";
 import { RolLisService } from "services/Users/RolService";
-import { UserListService } from "services/Users/UserService";
+import { UserListService, UserUpdateService, UserCreateService } from "services/Users/UserService";
 import DotSpin from "components/utils/BounciLoader";
 import { CustomModal } from "components/Modal/ModalMessage";
 
@@ -61,11 +63,11 @@ function Users() {
   const [err, setErr] = useState("");
 
   const { isOpen: isOpenErr, onOpen: onOpenErr, onClose: onCloseErr } = useDisclosure();
-
+  const toast = useToast();
 
   // Función para abrir el modal y definir si es para agregar o editar usuario
-  const handleOpenModal = (user = null) => {
-    setEditingUser(user);
+  const handleOpenModal = (user) => {
+    setEditingUser(user || null);
     setIsModalOpen(true);
   };
 
@@ -74,6 +76,121 @@ function Users() {
     setEditingUser(null);
   };
 
+  const handleUpdateUserService = async (data) => {
+    const { exito, msg } = await UserUpdateService(data);
+    if (exito) {
+      toast({
+        title: "Éxito",
+        description: "Usuario actualizado exitosamente",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+      handleCloseModal();
+    }
+    else{
+      if (msg === "USUARIO_NO_ENCONTRADO") {
+        toast({
+          title: "¡Error!",
+          description: "El usuario no fue encontrado",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+      if (msg === "DNI_EXISTENTE") {
+        toast({
+          title: "¡Error!",
+          description: "El número de DNI ya está asignado a un usuario",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+      else{
+        toast({
+          title: "Ups..",
+          description: "Ocurrió un error inesperado al actualizar el usuario",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    }
+  };
+
+  const handleAddUserService = async (data) => {
+    const { exito, msg } = await UserCreateService(data);
+    if (exito) {
+      toast({
+        title: "Éxito",
+        description: "Usuario guardado exitosamente",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+      handleCloseModal();
+    }
+    else if (msg === "DNI_EXISTENTE"){
+      toast({
+        title: "¡Error!",
+        description: "El número de DNI ya está asignado a un usuario",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+    else if (msg === "USUARIO_YA_EXISTE"){
+      toast({
+        title: "¡Error!",
+        description: "El correo electrónico ya está asignado a un usuario",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+    else{
+      toast({
+        title: "Ups..",
+        description: "Ocurrió un error inesperado al guardar el usuario",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
+  // metodo para agregar o editar usuario
+  const handleAddEditUser = async (data) => {
+    setLoading(true);
+    try {
+      if (!data) {
+        setErr("Error al obtener los datos del usuario");
+        onOpenErr();
+        return;
+      }
+      if(data.id) {
+        setMsg("Actualizando usuario...");
+        await handleUpdateUserService(data);
+      }
+      else{
+        setMsg("Guardando usuario...");
+        await handleAddUserService(data);
+      }
+    }
+    catch (error) {
+      console.error("Error al agregar o editar usuario:", error);
+      setErr("Error al agregar o editar usuario");
+      onOpenErr();
+    }
+    finally {
+      setLoading(false);
+      setMsg("");
+    }
+    setApplyFiltersFlag(true);
+  };
+
+  // Función para obtener la fecha actual
   // const today = new Date().toISOString().split("T")[0];
   const now = new Date();
   now.setHours(now.getHours() - 5);
@@ -399,7 +516,7 @@ function Users() {
               {listUsers.length === 0 ? (
                 <Tr>
                   <Th colSpan="6" textAlign="center" color="gray.400">
-                    No se encontraron usuarios
+                    No se encontraron resultados
                   </Th>
                 </Tr>
               ) :
@@ -427,14 +544,16 @@ function Users() {
       <ModalUserForm 
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        onSubmit={(data) => console.log("Guardando usuario:", data)}
+        onSubmit={(data) => handleAddEditUser(data)}
         user={editingUser}
+        roles={roles}
       />
       <CustomModal
 				header="Upss!"
 				message={err}
 				isOpen={isOpenErr}
 				onClose={onCloseErr}
+        zIndex="1300"
 			/>
       {loading && <DotSpin message={msg} />}
     </Flex>

@@ -23,6 +23,7 @@ function TablesTableRow(props) {
     status,
     date,
     lastItem,
+    onEdit,
   } = props;
   // const textColor = useColorModeValue("gray.700", "white");
   // const bgStatus = useColorModeValue("gray.400", "#1a202c");
@@ -114,7 +115,7 @@ function TablesTableRow(props) {
         </Button> */}
         <Flex direction={{ base: "column", md: "row" }} gap="20px">
           <Button
-            /* onClick={onOpenEdit} */
+            onClick={onEdit}
             borderRadius='12px'
             bg='brand.200'
             _hover={{ opacity: '0.8' }}

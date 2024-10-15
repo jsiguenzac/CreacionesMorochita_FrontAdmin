@@ -14,7 +14,7 @@ import {
     InputRightElement,
     Icon
 } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import DotSpin from 'components/utils/BounciLoader';
 import { UpdatePass } from '../../../services/Profile/UpdatePass';
@@ -130,11 +130,19 @@ export const ChangePasswordButtom = ({ isOpen, onClose }) => {
     const toggleShowConfirNewPassword = () => {
         setShowConfirNewPassword(!showConfirNewPassword);
     };
+
+    const handleCloseAndClearFields = () => {
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setCurrentPasswordError(false);
+        onClose();
+    }
     
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen} onClose={handleCloseAndClearFields}>
             <ModalOverlay />
-            <ModalContent maxW="400px" bg="rgba(25, 25, 25, 0.9)">
+            <ModalContent maxW="400px" bgGradient="linear(to-br, brand.600, brand.800)">
                 <ModalHeader color="white">Cambiar Contraseña</ModalHeader>
                 <ModalCloseButton color="white" />
                 <ModalBody>
@@ -234,7 +242,7 @@ export const ChangePasswordButtom = ({ isOpen, onClose }) => {
                             Cambiar
                         </Text>
                     </Button>
-                    <Button /* variant="ghost"  */colorScheme="blue" onClick={onClose}>Cancelar</Button>
+                    <Button /* variant="ghost"  */colorScheme="blue" onClick={handleCloseAndClearFields}>Cancelar</Button>
                 </ModalFooter>
             </ModalContent>
 			{loading && <DotSpin message="Cambiando contraseña..." />}

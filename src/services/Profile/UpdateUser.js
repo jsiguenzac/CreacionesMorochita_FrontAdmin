@@ -7,7 +7,8 @@ export const UpdateUser = async (form) => {
         name: form.name,
         last_name: form.last_name,
         dni: Number(form.dni),
-        phone: Number(form.phone)
+        phone: Number(form.phone),
+        isProfile: true
     };
     const [result, error] = await doRequest(
         "/User/Update",

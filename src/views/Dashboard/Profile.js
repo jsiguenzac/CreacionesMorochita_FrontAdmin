@@ -76,7 +76,8 @@ export default function Profile() {
 				clearAllStorage();
                 setErr("Usuario no encontrado o inactivo");
 				handleShowModalErr();
-            } else {
+            }
+			else {
                 clearAllStorage();
                 setErr("Error al obtener datos del usuario");
 				handleShowModalErr();

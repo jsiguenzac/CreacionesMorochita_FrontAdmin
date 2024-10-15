@@ -13,14 +13,17 @@ import {
   FormLabel,
   Select,
   Flex,
+  Text,
+  useToast,
 } from "@chakra-ui/react";
 
-const ModalUserForm = ({ isOpen, onClose, onSubmit, user }) => {
+const ModalUserForm = ({ isOpen, onClose, onSubmit, user, roles }) => {
+  const toast = useToast();
   // Estado para los campos del formulario
   const [formValues, setFormValues] = useState({
     id: "", // No visible en el formulario
     dni: "",
-    name: "",
+    nameForm: "",
     lastName: "",
     email: "",
     role: "",
@@ -30,12 +33,20 @@ const ModalUserForm = ({ isOpen, onClose, onSubmit, user }) => {
   // Efecto para llenar los campos si se pasa un usuario
   useEffect(() => {
     if (user) {
-      setFormValues(user);
+      setFormValues({
+        id: user.id_user,
+        dni: user.dni,
+        nameForm: user.name,
+        lastName: user.last_name,
+        email: user.email,
+        role: user.id_rol,
+        phone: user.phone,
+      });
     } else {
       setFormValues({
         id: "",
         dni: "",
-        name: "",
+        nameForm: "",
         lastName: "",
         email: "",
         role: "",
@@ -53,39 +64,77 @@ const ModalUserForm = ({ isOpen, onClose, onSubmit, user }) => {
     });
   };
 
-  // Manejar el envío del formulario
-  const handleSubmit = () => {
-    onSubmit(formValues);
-    onClose();
+  const handleClearForm = () => {
+    setFormValues({
+      id: "",
+      dni: "",
+      nameForm: "",
+      lastName: "",
+      email: "",
+      role: "",
+      phone: "",
+    });
   };
 
+  // Manejar el envío del formulario
+  const handleSubmit = () => {
+    if (!formValues.nameForm || !formValues.lastName || !formValues.email || !formValues.role) {
+      toast({
+        title: "Ups..",
+        description: "Rellene los campos requeridos (*) por favor.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      console.log("Faltan campos por rellenar", formValues);
+      return;
+    }
+    onSubmit(formValues);
+  };
+
+  const handleCancel = () => {
+    handleClearForm();
+    onClose();
+  }
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={handleCancel}>
       <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>{user ? "Editar Usuario" : "Agregar Usuario"}</ModalHeader>
-        <ModalCloseButton />
+      <ModalContent
+        overflowY="auto"
+        maxH="90vh"
+        /* bg="rgba(0, 0, 128, 0.9)" */
+        bgGradient="linear(to-br, brand.600, brand.800)"
+      >
+        <ModalHeader fontSize='xm' color='#fff' fontWeight='bold'>{user ? "Editar Usuario" : "Agregar Usuario"}</ModalHeader>
+        <ModalCloseButton color="white" />
         <ModalBody>
-          <FormControl mb={4}>
-            <FormLabel>DNI</FormLabel>
-            <Input
-              name="dni"
-              value={formValues.dni}
-              onChange={handleInputChange}
-            />
-          </FormControl>
           <Flex gap={4}>
-            <FormControl mb={4}>
-              <FormLabel>Nombre</FormLabel>
+            <FormControl mb={4} isRequired={true}>
+              <FormLabel fontSize='xm' color='#fff' fontWeight='bold'>Nombre</FormLabel>
               <Input
-                name="name"
-                value={formValues.name}
+                autoComplete="off"
+                type="text"
+                bg="white"
+                border="3px solid"
+                color="black"
+                borderRadius="8px"
+                _placeholder={{ color: 'gray.500' }}
+                placeholder="Ingrese su nombre"
+                name="nameForm"
+                value={formValues.nameForm}
                 onChange={handleInputChange}
               />
             </FormControl>
-            <FormControl mb={4}>
-              <FormLabel>Apellido</FormLabel>
+            <FormControl mb={4} isRequired={true}>
+              <FormLabel fontSize='xm' color='#fff' fontWeight='bold'>Apellido</FormLabel>
               <Input
+                bg="white"
+                border="3px solid"
+                color="black"
+                borderRadius="8px"
+                _placeholder={{ color: 'gray.500' }}
+                placeholder="Ingrese su apellido"
                 name="lastName"
                 value={formValues.lastName}
                 onChange={handleInputChange}
@@ -93,30 +142,79 @@ const ModalUserForm = ({ isOpen, onClose, onSubmit, user }) => {
             </FormControl>
           </Flex>
           <FormControl mb={4}>
-            <FormLabel>Correo</FormLabel>
-            <Input
+            <FormLabel fontSize='xm' color='#fff' fontWeight='bold'>
+              Correo {' '}
+              <Text as="span" color="red.500">
+                *
+              </Text>
+              {user && (
+              <Text as="span" color="red.500" fontSize="xs">
+                {' '}
+                Para editar el correo, contacte al desarrollador.
+              </Text>
+            )}
+            </FormLabel>
+            <Input              
+              bg="white"
+              border="3px solid"
+              color="black"
+              borderRadius="8px"
+              _placeholder={{ color: 'gray.500' }}
+              placeholder="Ingrese su correo"
               name="email"
               type="email"
               value={formValues.email}
+              disabled={user ? true : false}
               onChange={handleInputChange}
             />
           </FormControl>
-          <Flex gap={4}>
-            <FormControl mb={4}>
-              <FormLabel>Rol</FormLabel>
+          <FormControl mb={4} isRequired={true}>
+              <FormLabel fontSize='xm' color='#fff' fontWeight='bold'>Rol</FormLabel>
               <Select
+                bg="white"
+                border="3px solid"
+                color="black"
+                borderRadius="8px"
+                _placeholder={{ color: 'gray.500' }}
+                placeholder="Seleccione un rol"
                 name="role"
                 value={formValues.role}
                 onChange={handleInputChange}
               >
-                <option value="admin">Admin</option>
-                <option value="user">Usuario</option>
-                <option value="guest">Invitado</option>
+                {roles
+                  .filter((role) => role.id !== 5)
+                  .map((role) => (
+                  <option key={role.id} value={role.id}>
+                    {role.name}
+                  </option>
+                ))}
               </Select>
             </FormControl>
+          <Flex gap={4}>
             <FormControl mb={4}>
-              <FormLabel>Celular</FormLabel>
-              <Input
+              <FormLabel fontSize='xm' color='#fff' fontWeight='bold'>DNI</FormLabel>
+              <Input                
+                bg="white"
+                border="3px solid"
+                color="black"
+                borderRadius="8px"
+                _placeholder={{ color: 'gray.500' }}
+                placeholder="Ingrese su DNI"
+                type="number"
+                name="dni"
+                value={formValues.dni}
+                onChange={handleInputChange}
+              />
+            </FormControl>
+            <FormControl mb={4}>
+              <FormLabel fontSize='xm' color='#fff' fontWeight='bold'>Celular</FormLabel>
+              <Input                
+                bg="white"
+                border="3px solid"
+                color="black"
+                borderRadius="8px"
+                _placeholder={{ color: 'gray.500' }}
+                placeholder="Ingrese su Celular"
                 name="phone"
                 value={formValues.phone}
                 onChange={handleInputChange}
@@ -127,10 +225,16 @@ const ModalUserForm = ({ isOpen, onClose, onSubmit, user }) => {
           <Input name="id" value={formValues.id} type="hidden" />
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="blue" mr={3} onClick={handleSubmit}>
+          <Button 
+            _hover={{ opacity: '0.8' }}
+            _active={{ opacity: '0.9' }} 
+            bg='brand.200' mr={3}
+            onClick={handleSubmit}
+            textColor={'#fff'}
+          >
             {user ? "Guardar Cambios" : "Agregar Usuario"}
           </Button>
-          <Button variant="ghost" onClick={onClose}>
+          <Button colorScheme="blue" onClick={handleCancel}>
             Cancelar
           </Button>
         </ModalFooter>

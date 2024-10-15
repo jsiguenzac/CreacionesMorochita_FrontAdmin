@@ -61,9 +61,18 @@ export function EditProfileButton({ isOpen, onClose, userData, handleDataUser })
                 });
                 onClose();
             }
+            else if (msg === "DNI_EXISTENTE") {
+                toast({
+                    title: "¡Error!",
+                    description: "El DNI ya se encuentra registrado a otro usuario",
+                    status: "error",
+                    duration: 3000,
+                    isClosable: true,
+                });
+            }
             else {
                 toast({
-                    title: "Error al actualizar el perfil.",
+                    title: "¡Error!",
                     description: msg || "Ocurrió un error inesperado.",
                     status: "error",
                     duration: 3000,
@@ -93,13 +102,17 @@ export function EditProfileButton({ isOpen, onClose, userData, handleDataUser })
                 overflowY="auto"
                 mx="auto"
                 p={4}
-                bg="rgba(25, 25, 25, 0.9)" // Fondo oscuro y transparente
+                /* bg="rgba(25, 25, 25, 0.9)" // Fondo oscuro y transparente */
+                bgGradient="linear(to-br, brand.600, brand.800)"
             >
                 <ModalHeader color="white">Editar Perfil</ModalHeader>
                 <ModalCloseButton color="white" />
                 <ModalBody>
                     <Text fontSize='xm' color='#fff' fontWeight='bold'>
                         Nombre(s):
+                        <Text as="span" color="red.500" fontSize="xm">
+                            {' '}*
+                        </Text>
                     </Text>
                     <Input
                         type='text'
@@ -116,6 +129,9 @@ export function EditProfileButton({ isOpen, onClose, userData, handleDataUser })
                     />
                     <Text fontSize='xm' color='#fff' fontWeight='bold'>
                         Apellido(s):
+                        <Text as="span" color="red.500" fontSize="xm">
+                            {' '}*
+                        </Text>
                     </Text>
                     <Input
                         type='text'
@@ -132,6 +148,9 @@ export function EditProfileButton({ isOpen, onClose, userData, handleDataUser })
                     />
                     <Text fontSize='xm' color='#fff' fontWeight='bold'>
                         DNI:
+                        <Text as="span" color="red.500" fontSize="xm">
+                            {' '}*
+                        </Text>
                     </Text>
                     <Input
                         max={8}
@@ -168,6 +187,12 @@ export function EditProfileButton({ isOpen, onClose, userData, handleDataUser })
                     />
                     <Text fontSize='xm' color='#fff' fontWeight='bold'>
                         Correo electrónico:
+                        <Text as="span" color="red.500" fontSize="xm">
+                            {' '}*
+                        </Text>
+                    </Text>
+                    <Text as="span" color="red.500" fontSize="xm">
+                        Para editar el correo, contacte al desarrollador.
                     </Text>
                     <Input
                         disabled='disabled'

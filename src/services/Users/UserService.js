@@ -24,3 +24,56 @@ export const UserListService = async (form) => {
     else
         return { exito: false, msg: "Error desconocido"};
 }
+
+export const UserCreateService = async (form) => {
+    const body = {
+        dni: Number(form.dni) || null,
+        name: form.nameForm.trim(),
+        last_name: form.lastName.trim(),
+        email: form.email.trim(),
+        id_rol: Number(form.role) || null,
+        phone: Number(form.phone) || null,
+    };
+    const [result, error] = await doRequest(
+        "/User/Create",
+        "POST",
+        body,
+        getToken()
+    );
+    
+    if (error)
+        return;
+
+    const state = result?.state;
+    if(state === 1)
+        return { exito: result?.data?.exito, msg: result?.data?.mensaje};
+    else
+        return { exito: false, msg: result?.data?.mensaje};
+}
+
+export const UserUpdateService = async (form) => {
+    const body = {
+        id_user: Number(form.id),
+        dni: Number(form.dni) || null,
+        name: form.nameForm.trim(),
+        last_name: form.lastName.trim(),
+        email: form.email.trim(),
+        id_rol: Number(form.role) || null,
+        phone: Number(form.phone) || null,
+    };
+    const [result, error] = await doRequest(
+        "/User/Update",
+        "PUT",
+        body,
+        getToken()
+    );
+    
+    if (error)
+        return;
+
+    const state = result?.state;
+    if(state === 1)
+        return { exito: result?.data?.exito, msg: result?.data?.mensaje};
+    else
+        return { exito: false, msg: result?.data?.mensaje};
+}
