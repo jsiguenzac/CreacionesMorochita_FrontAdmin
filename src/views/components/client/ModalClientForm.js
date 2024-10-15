@@ -17,7 +17,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 
-const ModalUserForm = ({ isOpen, onClose, onSubmit, user, roles }) => {
+const ModalCLientForm = ({ isOpen, onClose, onSubmit, client }) => {
   const toast = useToast();
   // Estado para los campos del formulario
   const [formValues, setFormValues] = useState({
@@ -26,21 +26,19 @@ const ModalUserForm = ({ isOpen, onClose, onSubmit, user, roles }) => {
     nameForm: "",
     lastName: "",
     email: "",
-    role: "",
     phone: "",
   });
 
   // Efecto para llenar los campos si se pasa un usuario
   useEffect(() => {
-    if (user) {
+    if (client) {
       setFormValues({
-        id: user.id_user,
-        dni: user.dni,
-        nameForm: user.name,
-        lastName: user.last_name,
-        email: user.email,
-        role: user.id_rol,
-        phone: user.phone,
+        id: client.id_user,
+        dni: client.dni,
+        nameForm: client.name,
+        lastName: client.last_name,
+        email: client.email,
+        phone: client.phone,
       });
     } else {
       setFormValues({
@@ -49,11 +47,10 @@ const ModalUserForm = ({ isOpen, onClose, onSubmit, user, roles }) => {
         nameForm: "",
         lastName: "",
         email: "",
-        role: "",
         phone: "",
       });
     }
-  }, [user]);
+  }, [client]);
 
   // Manejar cambios en los inputs
   const handleInputChange = (e) => {
@@ -71,14 +68,13 @@ const ModalUserForm = ({ isOpen, onClose, onSubmit, user, roles }) => {
       nameForm: "",
       lastName: "",
       email: "",
-      role: "",
       phone: "",
     });
   };
 
   // Manejar el envío del formulario
   const handleSubmit = () => {
-    if (!formValues.nameForm || !formValues.lastName || !formValues.email || !formValues.role) {
+    if (!formValues.nameForm || !formValues.lastName || !formValues.email) {
       toast({
         title: "Ups..",
         description: "Rellene los campos requeridos (*) por favor.",
@@ -89,6 +85,7 @@ const ModalUserForm = ({ isOpen, onClose, onSubmit, user, roles }) => {
       console.log("Faltan campos por rellenar", formValues);
       return;
     }
+    console.log("Formulario enviado", formValues);
     onSubmit(formValues);
     if (onClose) {
       handleCancel();
@@ -109,7 +106,7 @@ const ModalUserForm = ({ isOpen, onClose, onSubmit, user, roles }) => {
         /* bg="rgba(0, 0, 128, 0.9)" */
         bgGradient="linear(to-br, brand.600, brand.800)"
       >
-        <ModalHeader fontSize='xm' color='#fff' fontWeight='bold'>{user ? "Editar Usuario" : "Agregar Usuario"}</ModalHeader>
+        <ModalHeader fontSize='xm' color='#fff' fontWeight='bold'>{client ? "Editar Cliente" : "Agregar Cliente"}</ModalHeader>
         <ModalCloseButton color="white" />
         <ModalBody>
           <Flex gap={4}>
@@ -150,7 +147,7 @@ const ModalUserForm = ({ isOpen, onClose, onSubmit, user, roles }) => {
               <Text as="span" color="red.500">
                 *
               </Text>
-              {user && (
+              {client && (
               <Text as="span" color="red.500" fontSize="xs">
                 {' '}
                 Para editar el correo, contacte al desarrollador.
@@ -167,11 +164,11 @@ const ModalUserForm = ({ isOpen, onClose, onSubmit, user, roles }) => {
               name="email"
               type="email"
               value={formValues.email}
-              disabled={user ? true : false}
+              disabled={client ? true : false}
               onChange={handleInputChange}
             />
           </FormControl>
-          <FormControl mb={4} isRequired={true}>
+          {/* <FormControl mb={4} isRequired={true}>
               <FormLabel fontSize='xm' color='#fff' fontWeight='bold'>Rol</FormLabel>
               <Select
                 bg="white"
@@ -192,7 +189,7 @@ const ModalUserForm = ({ isOpen, onClose, onSubmit, user, roles }) => {
                   </option>
                 ))}
               </Select>
-            </FormControl>
+            </FormControl> */}
           <Flex gap={4}>
             <FormControl mb={4}>
               <FormLabel fontSize='xm' color='#fff' fontWeight='bold'>DNI</FormLabel>
@@ -235,7 +232,7 @@ const ModalUserForm = ({ isOpen, onClose, onSubmit, user, roles }) => {
             onClick={handleSubmit}
             textColor={'#fff'}
           >
-            {user ? "Guardar Cambios" : "Agregar Usuario"}
+            {client ? "Guardar Cambios" : "Agregar Cliente"}
           </Button>
           <Button colorScheme="blue" onClick={handleCancel}>
             Cancelar
@@ -246,4 +243,4 @@ const ModalUserForm = ({ isOpen, onClose, onSubmit, user, roles }) => {
   );
 };
 
-export default ModalUserForm;
+export default ModalCLientForm;

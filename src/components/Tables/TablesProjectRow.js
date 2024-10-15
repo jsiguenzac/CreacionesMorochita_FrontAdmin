@@ -12,7 +12,7 @@ import {
 import { FaPencilAlt, FaWhatsapp, FaUserCircle, FaRegFileExcel } from 'react-icons/fa';
 
 function DashboardTableRow(props) {
-  const { logo, name, status, budget, dni, email, phone, progression, lastItem } = props;
+  const { logo, name, status, budget, dni, email, phone, progression, lastItem, onEdit } = props;
   const textColor = useColorModeValue("gray.700", "white");
   return (
     <Tr>
@@ -31,13 +31,13 @@ function DashboardTableRow(props) {
       <Td borderBottomColor='#56577A' border={lastItem ? "none" : null}>
         <Flex alignItems='center' textAlign={"center"} py='.8rem' minWidth='100%' flexWrap='nowrap'>
           <Text fontSize='sm' textAlign={"center"} color='#fff' pb='.5rem'  >
-            {dni}
+            {dni || ' - '}
           </Text>
         </Flex>
       </Td>
       <Td borderBottomColor='#56577A' border={lastItem ? "none" : null}>
         <Text fontSize='sm' textAlign={"center"} color='#fff' pb='.5rem'>
-          {phone}
+          {phone || ' - '}
         </Text>
       </Td>
       <Td borderBottomColor='#56577A' border={lastItem ? "none" : null}>
@@ -57,7 +57,7 @@ function DashboardTableRow(props) {
         border={lastItem ? "none" : null}>
         <Flex alignItems='center' textAlign={"center"} py='.8rem' minWidth='100%' >
           <Text fontSize='sm' color='#fff' fontWeight='bold' minWidth='100%'>
-          {budget}
+            S/.{' '}{budget}
           </Text>
         </Flex>
       </Td>
@@ -86,7 +86,7 @@ function DashboardTableRow(props) {
       <Td borderBottomColor='#56577A' border={lastItem ? "none" : null}>
       <Flex direction={{ base: "column", md: "row" }} gap="20px">
         <Button
-          /* onClick={onOpenEdit} */
+          onClick={onEdit}
           borderRadius='12px'
           bg='brand.200'
           _hover={{ opacity: '0.8' }}
@@ -99,16 +99,21 @@ function DashboardTableRow(props) {
         </Button>
         <Button
           /* onClick={onOpenEdit} */
+          disabled={budget <= 0}
           borderRadius='12px'
-          bg='blue.500'
-          _hover={{ opacity: '0.8' }}
-          _active={{ opacity: '0.9' }}
+          bg='green.500'
+          _hover={budget <= 0 ? { opacity: '0.1' } : { opacity: '0.8' }}
+          _active={budget <= 0 ?{ opacity: '0.3' } : { opacity: '0.9' }}
           me={{ base: 'none', lg: 'auto' }}
-          width={{ base: '100px', md: 'auto' }}
-          leftIcon={<Icon color='white' as={FaRegFileExcel} />}>
-          {/* <Text fontSize='xs' color='#fff' fontWeight='bold'>
-            {''}
-          </Text> */}
+          width={{ base: '100%', lg: 'auto' }}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          leftIcon={<Icon color='white' as={FaRegFileExcel} />}
+        >
+        <Text fontSize='xs' color='#fff' fontWeight='bold'>
+          Descargar
+        </Text>
         </Button>
       </Flex>
       </Td>

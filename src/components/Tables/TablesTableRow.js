@@ -64,8 +64,8 @@ function TablesTableRow(props) {
         borderBottomColor='#56577A'
         minW='150px'>
         <Flex direction='column'>
-        <Text fontSize='sm' color='#fff' fontWeight='normal'>
-            {dni}
+          <Text fontSize='sm' color='#fff' fontWeight='normal'>
+            {dni || ' - '}
           </Text>
           {/*<Text fontSize='sm' color='#fff' fontWeight='normal'>
             {domain}

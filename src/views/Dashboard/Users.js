@@ -520,7 +520,9 @@ function Users() {
                   </Th>
                 </Tr>
               ) :
-              listUsers.map((row, index, arr) => {
+              listUsers
+                .filter((user) => user.id_rol !== 5)
+                .map((row, index, arr) => {
                 return (
                   <TablesTableRow
                     key={row.id_user}
