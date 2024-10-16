@@ -17,7 +17,7 @@ Imagen referencial:
 Instalación
 -----------
 
-No es necesario crear un entorno virtual, para instalar las dependencias ejecute en la terminal:
+No es necesario crear un entorno virtual, para instalar las dependencias ejecute desde la terminal:
 
 Usar `Command Prompt` (recomendable)
 
