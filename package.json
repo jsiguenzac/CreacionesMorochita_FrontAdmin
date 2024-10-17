@@ -45,7 +45,9 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "cross-env PUBLIC_URL=/ cross-env CI=false react-scripts build && gulp licenses",
-    "test": "react-scripts test --env=jsdom",
+    "test": "jest",
+    "test:coverage": "react-scripts test --env=jsdom --coverage --watchAll=false",
+    "test:watch": "react-scripts test --watchAll",
     "eject": "react-scripts eject",
     "deploy": "npm run build",
     "lint:check": "eslint . --ext=js,jsx;  exit 0",
@@ -57,13 +59,32 @@
     "typescript": "4.2.4"
   },
   "devDependencies": {
+    "@babel/core": "^7.25.8",
     "@babel/plugin-transform-react-jsx-source": "^7.14.5",
+    "@babel/preset-env": "^7.25.8",
+    "@babel/preset-react": "^7.25.7",
+    "@testing-library/jest-dom": "^6.6.1",
+    "@testing-library/react": "^12.1.5",
+    "babel-jest": "^29.7.0",
     "cross-env": "^7.0.3",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-prettier": "3.4.0",
     "gulp": "4.0.2",
     "gulp-append-prepend": "1.0.9",
+    "jest": "^27.5.1",
     "prettier": "2.2.1"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "testMatch": [
+      "**/tests/**/*.test.js",
+      "**/?(*.)+(spec|test).[jt]s?(x)"
+    ],
+    "moduleNameMapper": {
+      "\\.(css|less)$": "<rootDir>/tests/__mocks__/styleMock.js",
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/test/__mocks__/fileMock.js",
+      "^@/(.+)$": "<rootDir>/src/$1"
+    }
   },
   "browserslist": {
     "production": [
