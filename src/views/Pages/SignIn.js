@@ -241,7 +241,7 @@ function signin() {
                 Recuérdame
               </FormLabel>
             </FormControl>
-            <Button
+            <Button data-testid="btn-signin"
               variant='brand'
               fontSize='10px'
               type='submit'

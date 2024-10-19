@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import {
 	Avatar,
 	AvatarBadge,
@@ -38,7 +39,6 @@ import {
 	lineChartOptionsProfile1,
 	lineChartOptionsProfile2
 } from 'variables/charts';
-import { React, useState, useEffect } from 'react';
 import { CustomModal } from 'components/Modal/ModalMessage';
 import { DetailUser } from 'services/Profile/DetailUser';
 import DotSpin from 'components/utils/BounciLoader';

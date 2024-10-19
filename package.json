@@ -63,7 +63,7 @@
     "@babel/plugin-transform-react-jsx-source": "^7.14.5",
     "@babel/preset-env": "^7.25.8",
     "@babel/preset-react": "^7.25.7",
-    "@testing-library/jest-dom": "^6.6.1",
+    "@testing-library/jest-dom": "^6.6.2",
     "@testing-library/react": "^12.1.5",
     "babel-jest": "^29.7.0",
     "cross-env": "^7.0.3",
@@ -76,13 +76,20 @@
   },
   "jest": {
     "testEnvironment": "jsdom",
+    "moduleDirectories": [
+      "node_modules",
+      "src"
+    ],
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest"
+    },
     "testMatch": [
       "**/tests/**/*.test.js",
       "**/?(*.)+(spec|test).[jt]s?(x)"
     ],
     "moduleNameMapper": {
       "\\.(css|less)$": "<rootDir>/tests/__mocks__/styleMock.js",
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/test/__mocks__/fileMock.js",
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/tests/__mocks__/fileMock.js",
       "^@/(.+)$": "<rootDir>/src/$1"
     }
   },

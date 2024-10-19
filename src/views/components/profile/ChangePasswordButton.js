@@ -1,3 +1,4 @@
+import React from 'react';
 import {
     Modal,
     ModalOverlay,
@@ -14,7 +15,7 @@ import {
     InputRightElement,
     Icon
 } from '@chakra-ui/react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import DotSpin from 'components/utils/BounciLoader';
 import { UpdatePass } from '../../../services/Profile/UpdatePass';
@@ -231,7 +232,7 @@ export const ChangePasswordButtom = ({ isOpen, onClose }) => {
                 </ModalBody>
 
                 <ModalFooter>
-                    <Button
+                    <Button data-testid="btn-change-pass"
                         _hover={{ opacity: '0.8' }}
                         _active={{ opacity: '0.9' }} 
                         bg='brand.200'

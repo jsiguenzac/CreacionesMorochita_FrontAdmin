@@ -1,5 +1,5 @@
+import React, { useState, useEffect } from 'react';
 import { Button, Text, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton, Input, useToast } from '@chakra-ui/react';
-import { useState, useEffect } from 'react';
 import { UpdateUser } from '../../../services/Profile/UpdateUser';
 import DotSpin from 'components/utils/BounciLoader';
 
@@ -49,7 +49,11 @@ export function EditProfileButton({ isOpen, onClose, userData, handleDataUser })
         }
         setLoading(true);
         try {
-            const { exito, msg} = await UpdateUser(formData);
+            const { exito, msg} = await UpdateUser({
+                ...formData,
+                dni: Number(formData.dni),
+                phone: formData.phone ? Number(formData.phone) : null
+            });
             if (exito) {
                 handleDataUser();
                 toast({
@@ -210,7 +214,7 @@ export function EditProfileButton({ isOpen, onClose, userData, handleDataUser })
                 </ModalBody>
 
                 <ModalFooter>
-                    <Button
+                    <Button data-testid="btn-save-profile"
                         _hover={{ opacity: '0.8' }}
                         _active={{ opacity: '0.9' }} 
                         bg='brand.200' mr={3} 
