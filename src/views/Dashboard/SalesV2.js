@@ -1,390 +1,472 @@
-import React from "react";
-import { useHistory } from "react-router-dom";
-// Chakra imports
-import { Box, Button, Flex, Grid, Icon, Spacer, Text } from "@chakra-ui/react";
+import React, { useState, useEffect } from "react";
+import {
+  Flex,
+  Table,
+  Tbody,
+  Text,
+  Th,
+  Thead,
+  Button,
+  Tr,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  FormControl,
+  FormLabel,
+  Input,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  InputGroup,
+  InputRightElement,
+  useDisclosure,
+  useToast,
+} from "@chakra-ui/react";
+import { ChevronDownIcon, CalendarIcon } from "@chakra-ui/icons";
 
-// Images
-import BackgroundCard1 from "assets/img/billing-background-card.png";
-
-// Custom components
 import Card from "components/Card/Card.js";
-import CardBody from "components/Card/CardBody.js";
 import CardHeader from "components/Card/CardHeader.js";
-import GradientBorder from "components/GradientBorder/GradientBorder";
-import IconBox from "components/Icons/IconBox";
-import BillingRow from "components/Tables/BillingRow";
-import InvoicesRow from "components/Tables/InvoicesRow";
-import TransactionRow from "components/Tables/TransactionRow";
+import CardBody from "components/Card/CardBody.js";
+import TableRowSales from "components/Tables/TablesProjectRowSales";
+import { salesData } from "variables/general";
+import { StatusListService } from "services/Sales/StatusSales";
+import { SalesListService } from "services/Sales/SalesService";
+import { UserListService } from "services/Users/UserService";
+import DotSpin from "components/utils/BounciLoader";
+import { CustomModal } from "components/Modal/ModalMessage";
+import { dateToTimestamp } from "components/utils/Methods";
 
-// Icons
-import { FaPencilAlt, FaRegCalendarAlt } from "react-icons/fa";
-import { IoEllipsisHorizontalSharp } from "react-icons/io5";
-import { RiMastercardFill } from "react-icons/ri";
-import {
-  BillIcon,
-  GraphIcon,
-  MastercardIcon,
-  VisaIcon,
-} from "components/Icons/Icons";
+// Componente personalizado
+import ModalSaleForm from "../components/sales/ModalSaleForm";
 
-// Data
-import {
-  billingData,
-  invoicesData,
-  newestTransactions,
-  olderTransactions,
-} from "variables/general";
+function Sales() {
+  const [sellers, setSellers] = useState([]);
+  const [status, setStatus] = useState([]);
+  const [idStatus, setIdStatus] = useState(0);
+  const [idSeller, setIdSeller] = useState(0);
+  const [sales, setSales] = useState([]);
+  const [totalSales, setTotalSales] = useState(0);
+  const [salesPerPage, setSalesPerPage] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [err, setErr] = useState("");
+  const [page, setPage] = useState(1);
+  const [applyFiltersFlag, setApplyFiltersFlag] = useState(false);
+  // Función para obtener la fecha actual
+  const now = new Date();
+  now.setHours(now.getHours() - 5);
+  const today = now.toISOString().split("T")[0];
+  
+  const [filters, setFilters] = useState({
+    seller: "",
+    status: "",
+    saleDate: "",
+  });
 
-function SalesV2() {
-  const { push } = useHistory();
-  const detailSalePage = "/admin/ventas/detalle";
-  const goToDetails = () => {
-    
-    push(detailSalePage);
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFilters({
+      ...filters,
+      [name]: value,
+    });
+  };
+
+  const handleStatusList = async () => {
+    setLoading(true);
+    setMsg("Cargando estados...");
+    try {
+      const { data, msg } = await StatusListService();
+      if (data) {
+        setStatus(data);
+      }
+      else {
+        console.log("Error al obtener la lista de estados:", msg);
+        setErr("Error al obtener los estados");
+        onOpenErr();
+      }
+    }
+    catch (error) {
+      console.error("Error al obtener la lista de estados:", error);
+      setErr("Error al obtener los estados");
+      onOpenErr();
+    }
+    finally {
+      setLoading(false);
+      setMsg("");
+    }
   }
 
+  const handleApplyFilters = async () => {
+    const ts = dateToTimestamp(filters.saleDate);
+    // Lógica para aplicar los filtros
+    const form = {
+      page: page,
+      idSeller: idSeller,
+      idStatus: idStatus,
+      dateSale: ts,
+    };
+    setLoading(true);
+    setMsg("Cargando ventas...");
+    try {
+      const { data, msg } = await SalesListService(form);
+      if (data) {
+        setSales(data.sales);
+        setTotalSales(data.total);
+        setSalesPerPage(data.page_size);
+      }
+      else {
+        console.log("Error al obtener la lista de ventas:", msg);
+        setErr("Error al obtener los ventas");
+        onOpenErr();
+      }
+    }
+    catch (error) {
+      console.error("Error al obtener la lista de ventas:", error);
+      setErr("Error al obtener los ventas");
+      onOpenErr();
+    }
+    finally {
+      setLoading(false);
+      setMsg("");
+    }
+  };
+
+  const handleSellerList = async () => {
+    // Lógica para aplicar los filtros
+    const form = {
+      page: 1,
+      name: "",
+      idRol: 3,
+      dateCreation: -1,
+    };
+    setLoading(true);
+    setMsg("Cargando vendedores...");
+    try {
+      const { data, msg } = await UserListService(form);
+      if (data) {
+        setSellers(data.users);
+      }
+      else {
+        console.log("Error al obtener la lista de vendedores:", msg);
+        setErr("Error al obtener los vendedores");
+        onOpenErr();
+      }
+    }
+    catch (error) {
+      console.error("Error al obtener la lista de vendedores:", error);
+      setErr("Error al obtener los vendedores");
+      onOpenErr();
+    }
+    finally {
+      setLoading(false);
+      setMsg("");
+    }
+  };
+
+  useEffect(() => {
+    // llamada de servicios al cargar la vista
+    handleStatusList();
+    handleSellerList();
+    handleApplyFilters();
+		if (onCloseErr) {
+			setErr("");
+		}
+  }, []);
+
+  const handleClearFilters = () => {
+    setFilters({
+      seller: "",
+      status: "",
+      saleDate: "",
+    });
+    setIdStatus(0);
+    setIdSeller(0);
+    setPage(1);
+    setApplyFiltersFlag(true);
+  };
+
+  useEffect(() => {
+    if (applyFiltersFlag) {
+      handleApplyFilters();
+      setApplyFiltersFlag(false);
+    }
+  }, [applyFiltersFlag]);
+
+  const handleIncrementPage = () => {
+    setPage(page + 1);
+    setApplyFiltersFlag(true);
+  };
+
+  const handleDecrementPage = () => {
+    if (page === 1) return;
+    setPage(page - 1);
+    setApplyFiltersFlag(true);
+  };
+
+  const { isOpen: isOpenErr, onOpen: onOpenErr, onClose: onCloseErr } = useDisclosure();
+  const toast = useToast();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [selectedSale, setSelectedSale] = useState(null);
+
+  const handleAddSale = () => {
+    setSelectedSale(null);
+    onOpen();
+  };
+
+  const handleViewDetails = (sale) => {
+    setSelectedSale(sale);
+    onOpen();
+  };
+
   return (
-    <Flex direction='column' pt={{ base: "120px", md: "75px" }} mx='auto'>
-      <Grid templateColumns={{ sm: "1fr", lg: "60% 38%" }}>
-        <Box>
-          <Grid
-            templateColumns={{
-              sm: "1fr",
-              md: "1fr 1fr",
-            }}
-            gap='26px'>
-              {/* Mastercard */}
-            <Card
-              backgroundImage={BackgroundCard1}
-              backgroundRepeat='no-repeat'
-              bgSize='cover'
-              bgPosition='10%'
-              p='16px'>
-              <CardBody h='100%' w='100%'>
-                <Flex
-                  direction='column'
-                  color='white'
-                  h='100%'
-                  p='0px 10px 20px 10px'
-                  w='100%'>
-                  <Flex justify='space-between' align='center'>
-                    <Text fontSize='md' fontWeight='bold'>
-                      Vision UI
-                    </Text>
-                    <Icon
-                      as={RiMastercardFill}
-                      w='48px'
-                      h='auto'
-                      color='gray.400'
-                    />
-                  </Flex>
-                  <Spacer />
-                  <Flex direction='column'>
-                    <Box>
-                      <Text
-                        fontSize={{ sm: "xl", lg: "lg", xl: "xl" }}
-                        letterSpacing='2px'
-                        fontWeight='bold'>
-                        7812 2139 0823 XXXX
-                      </Text>
-                    </Box>
-                    <Flex mt='14px'>
-                      <Flex direction='column' me='34px'>
-                        <Text fontSize='xs'>VALID THRU</Text>
-                        <Text fontSize='xs' fontWeight='bold'>
-                          05/24
-                        </Text>
-                      </Flex>
-                      <Flex direction='column'>
-                        <Text fontSize='xs'>CVV</Text>
-                        <Text fontSize='xs' fontWeight='bold'>
-                          09X
-                        </Text>
-                      </Flex>
-                    </Flex>
-                  </Flex>
-                </Flex>
-              </CardBody>
-            </Card>
-            {/* Credit Balance */}
-            <Card>
-              <Flex direction='column'>
-                <Flex
-                  justify='space-between'
-                  p='22px'
-                  mb='18px'
-                  bg='linear-gradient(127.09deg, rgba(34, 41, 78, 0.94) 19.41%, rgba(10, 14, 35, 0.49) 76.65%)'
-                  borderRadius='18px'>
-                  <Flex direction='column'>
-                    <Text color='#E9EDF7' fontSize='12px'>
-                      Credit Balance
-                    </Text>
-                    <Text color='#fff' fontWeight='bold' fontSize='34px'>
-                      $25,215
-                    </Text>
-                  </Flex>
-                  <Flex direction='column'>
-                    <Button
-                      bg='transparent'
-                      _hover='none'
-                      _active='none'
-                      alignSelf='flex-end'
-                      p='0px'>
-                      <Icon
-                        as={IoEllipsisHorizontalSharp}
-                        color='#fff'
-                        w='24px'
-                        h='24px'
-                        justifySelf='flex-start'
-                        alignSelf='flex-start'
-                      />
-                    </Button>
-                    <GraphIcon w='60px' h='18px' />
-                  </Flex>
-                </Flex>
-                <Text fontSize='10px' color='gray.400' mb='8px'>
-                  NEWEST
-                </Text>
-                <Flex justify='space-between' align='center'>
-                  <Flex align='center'>
-                    <IconBox
-                      bg='#22234B'
-                      borderRadius='30px'
-                      w='42px'
-                      h='42px'
-                      me='10px'>
-                      <BillIcon w='22px' h='22px' />
-                    </IconBox>
-                    <Flex direction='column'>
-                      <Text color='#fff' fontSize='sm' mb='2px'>
-                        Bill & Taxes
-                      </Text>
-                      <Text color='gray.400' fontSize='sm'>
-                        Today, 16:36
-                      </Text>
-                    </Flex>
-                  </Flex>
-                  <Text color='#fff' fontSize='sm' fontWeight='bold'>
-                    -$154.50
-                  </Text>
-                </Flex>
-              </Flex>
-            </Card>
-          </Grid>
-          {/* Payment Method */}
-          <Card p='16px' mt='24px'>
-            <CardHeader>
-              <Flex
-                justify='space-between'
-                align='center'
-                minHeight='60px'
-                w='100%'>
-                <Text fontSize='lg' color='#fff' fontWeight='bold'>
-                  Payment Method
-                </Text>
-                <Button maxW='135px' fontSize='10px' variant='brand'>
-                  ADD A NEW CARD
-                </Button>
-              </Flex>
-            </CardHeader>
-            <CardBody>
-              <Flex
-                direction={{ sm: "column", md: "row" }}
-                align='center'
-                w='100%'
-                justify='center'
-                py='1rem'>
-                <GradientBorder
-                  mb={{ sm: "24px", md: "0px" }}
-                  me={{ sm: "0px", md: "24px" }}
-                  w='100%'
-                  borderRadius='20px'>
-                  <Flex
-                    p='22px'
-                    bg='rgb(31, 35, 89)'
-                    border='transparent'
-                    borderRadius='20px'
-                    align='center'
-                    w='100%'>
-                    <IconBox me='10px' w='25px' h='22px'>
-                      <MastercardIcon w='100%' h='100%' />
-                    </IconBox>
-                    <Text color='#fff' fontSize='sm'>
-                      7812 2139 0823 XXXX
-                    </Text>
-                    <Spacer />
-                    <Button
-                      p='0px'
-                      bg='transparent'
-                      w='16px'
-                      h='16px'
-                      variant='no-hover'>
-                      <Icon as={FaPencilAlt} color='#fff' w='12px' h='12px' />
-                    </Button>
-                  </Flex>
-                </GradientBorder>
-                <GradientBorder w='100%' borderRadius='20px'>
-                  <Flex
-                    p='22px'
-                    bg='rgb(31, 35, 89)'
-                    w='100%'
-                    borderRadius='20px'
-                    border='transparent'
-                    align='center'>
-                    <IconBox me='10px' w='25px' h='25px'>
-                      <VisaIcon w='100%' h='100%' color='#fff' />
-                    </IconBox>
-                    <Text color='#fff' fontSize='sm'>
-                      7812 2139 0823 XXXX
-                    </Text>
-                    <Spacer />
-                    <Button
-                      p='0px'
-                      bg='transparent'
-                      w='16px'
-                      h='16px'
-                      variant='no-hover'>
-                      <Icon as={FaPencilAlt} color='#fff' w='12px' h='12px' />
-                    </Button>
-                  </Flex>
-                </GradientBorder>
-              </Flex>
-            </CardBody>
-          </Card>
-        </Box>
-        {/* Invoices List */}
-        <Card
-          p='22px'
-          my={{ sm: "24px", lg: "0px" }}
-          ms={{ sm: "0px", lg: "24px" }}>
-          <CardHeader>
-            <Flex
-              justify='space-between'
-              align='center'
-              mb='1rem'
-              w='100%'
-              /* mb='28px' */>
-              <Text fontSize='lg' color='#fff' fontWeight='bold'>
-                Invoices
-              </Text>
-              <Button
-                onClick={goToDetails}
-                variant='brand'
-                fontSize='10px'
-                fontWeight='bold'
-                p='6px 32px'>
-                VIEW ALL
-              </Button>
-            </Flex>
-          </CardHeader>
-          <CardBody>
-            <Flex direction='column' w='100%'>
-              {invoicesData.map((row) => {
-                return (
-                  <InvoicesRow
-                    date={row.date}
-                    code={row.code}
-                    price={row.price}
-                    logo={row.logo}
-                    format={row.format}
-                  />
-                );
-              })}
-            </Flex>
-          </CardBody>
-        </Card>
-      </Grid>
-      <Grid templateColumns={{ sm: "1fr", lg: "60% 38%" }}>
-        {/* Billing Information */}
-        <Card my={{ lg: "24px" }} me={{ lg: "24px" }}>
-          <Flex direction='column'>
-            <CardHeader py='12px'>
-              <Text color='#fff' fontSize='lg' fontWeight='bold'>
-                Billing Information
-              </Text>
-            </CardHeader>
-            <CardBody>
-              <Flex direction='column' w='100%'>
-                {billingData.map((row) => {
-                  return (
-                    <BillingRow
-                      name={row.name}
-                      company={row.company}
-                      email={row.email}
-                      number={row.number}
-                    />
-                  );
-                })}
-              </Flex>
-            </CardBody>
+    <Flex direction="column" pt={{ base: "120px", md: "75px" }}>
+      <Card mb="22px">
+        <CardHeader p="6px 0px 22px 0px">
+          <Flex direction={{ base: "column", md: "row" }} gap="20px">
+            <Text fontSize="lg" color="#fff" fontWeight="bold">
+              Filtros de Ventas
+            </Text>
           </Flex>
-        </Card>
-        {/* Transactions List */}
-        <Card my='24px' ms={{ lg: "24px" }}>
-          <CardHeader mb='12px'>
-            <Flex direction='column' w='100%'>
-              <Flex
-                direction={{ sm: "column", lg: "row" }}
-                justify={{ sm: "center", lg: "space-between" }}
-                align={{ sm: "center" }}
-                w='100%'
-                my={{ md: "12px" }}>
-                <Text
-                  color='#fff'
-                  fontSize={{ sm: "lg", md: "xl", lg: "lg" }}
-                  fontWeight='bold'>
-                  Your Transactions
+          <Button
+            marginLeft={{ base: "50px", md: "auto" }}
+            colorScheme="blue"
+            onClick={handleAddSale}
+          >
+            Nueva Venta
+          </Button>
+        </CardHeader>
+        <CardBody>
+          <Flex direction={{ base: "column", md: "row" }} gap="20px">
+          <FormControl>
+              <FormLabel color="gray.400">Vendedor</FormLabel>
+              <Menu>
+                <MenuButton
+                  width={{ base: "100%", md: "220px" }}
+                  border="1px solid #4B5563"
+                  as={Button}
+                  rightIcon={<ChevronDownIcon color={filters.seller ? "white" : "gray.200"} />}
+                  bg="none" 
+                  bord color={!filters.seller ? "gray.500" : "white" } 
+                  _hover={{ bg: "none", borderColor: "gray.300" }}
+                  _active={{ bg: "none", borderColor: "white" }}
+                >
+                  {filters.seller || "Seleccionar Vendedor"}
+                </MenuButton>
+                <MenuList bg="gray.700" color="white" size="12px">
+                  {sellers
+                    .map((s) => (
+                    <MenuItem
+                      size="12px"
+                      key={s.id_user}
+                      onClick={() => {
+                        setFilters((prevFilters) => ({ ...prevFilters, seller: s.name }));
+                        setIdSeller(s.id_user);
+                      }}
+                      /* onClick={() => setFilters({ ...filters, role: rol.name })} */
+                      _hover={{ bg: "purple.500" }}
+                      _focus={{ bg: "purple.500" }}
+                    >
+                      {s.name} {s.last_name}
+                    </MenuItem>
+                  ))}
+                </MenuList>
+              </Menu>
+            </FormControl>
+            <FormControl>
+              <FormLabel color="gray.400">Estado</FormLabel>
+              <Menu>
+                <MenuButton
+                  width={{ base: "100%", md: "220px" }}
+                  border="1px solid #4B5563"
+                  as={Button}
+                  rightIcon={<ChevronDownIcon color={filters.status ? "white" : "gray.200"} />}
+                  bg="none" 
+                  bord color={!filters.status ? "gray.500" : "white" } 
+                  _hover={{ bg: "none", borderColor: "gray.300" }}
+                  _active={{ bg: "none", borderColor: "white" }}
+                >
+                  {filters.status || "Seleccionar Estado"}
+                </MenuButton>
+                <MenuList bg="gray.700" color="white" size="12px">
+                  {status
+                    .map((s) => (
+                    <MenuItem
+                      size="12px"
+                      key={s.id}
+                      onClick={() => {
+                        setFilters((prevFilters) => ({ ...prevFilters, status: s.name }));
+                        setIdStatus(s.id);
+                      }}
+                      /* onClick={() => setFilters({ ...filters, role: rol.name })} */
+                      _hover={{ bg: "purple.500" }}
+                      _focus={{ bg: "purple.500" }}
+                    >
+                      {s.name}
+                    </MenuItem>
+                  ))}
+                </MenuList>
+              </Menu>
+            </FormControl>
+            <FormControl>
+              <FormLabel color="gray.400">Fecha de Venta</FormLabel>
+              <InputGroup
+                width={{ base: "100%", md: "auto" }}
+              >
+                <InputRightElement pointerEvents="none">
+                  <CalendarIcon 
+                    color="gray.400"
+                    marginRight="55px"
+                  />
+                </InputRightElement>
+                <Input
+                  type="date"
+                  pl="10px"
+                  name="saleDate"
+                  value={filters.saleDate}
+                  onChange={handleInputChange}
+                  color="#fff"
+                  borderColor="gray.600"
+                  max={today}
+                />
+              </InputGroup>
+            </FormControl>
+          </Flex>
+          {/* Flex for the buttons */}
+          <Flex
+            mt="30px"
+            marginStart={{ base: "0px", md: "20px" }}
+            justifyContent="flex-end"
+            gap="10px"
+            direction={{ base: "column", md: "row" }}
+          >
+            <Button
+              _hover={{ bg: "brand.300" }}
+              bg={"brand.200"}
+              textColor={"white"}
+              onClick={handleApplyFilters}
+              width={{ base: "100px", md: "auto" }}
+              marginLeft={{ base: "30px", md: "0px" }}
+            >
+              Aplicar
+            </Button>
+            <Button
+              _hover={{ bg: "white" }}
+              bg={"gray.300"}
+              disabled={Object.values(filters).every((filter) => filter === "") && page === 1}
+              onClick={handleClearFilters}
+              width={{ base: "100px", md: "auto" }}
+              marginLeft={{ base: "30px", md: "0px" }}
+            >
+              Limpiar
+            </Button>
+            {/* <Flex
+              marginStart={{ base: "0px", md: "50px", lg: "50px" }}
+              justifyContent="flex-end"
+              gap="10px"
+              direction={{ base: "column", md: "row" }}
+            > */}
+              <Button
+                _hover={{ bg: page === 1 ? "gray.400" : "purple.500" }}
+                bg={page === 1 ? "gray.300" : "brand.200"}
+                disabled={page === 1}
+                onClick={handleDecrementPage}
+                width={{ base: "70px", md: "70px" }}
+                marginLeft={{ base: "30px", md: "50px" }}
+              >
+                <Text fontSize="lg" color="#fff" fontWeight="bold">
+                  {'<'}
                 </Text>
-                <Flex align='center'>
-                  <Icon
-                    as={FaRegCalendarAlt}
-                    color='gray.400'
-                    w='15px'
-                    h='15px'
-                    /* color='#fff' */
-                    me='6px'
-                  />
-                  <Text color='gray.400' fontSize='sm'>
-                    23 - 30 March 2021
-                  </Text>
-                </Flex>
-              </Flex>
-            </Flex>
-          </CardHeader>
-          <CardBody>
-            <Flex direction='column' w='100%'>
-              <Text color='gray.400' fontSize='xs' mb='18px'>
-                NEWEST
-              </Text>
-              {newestTransactions.map((row) => {
-                return (
-                  <TransactionRow
-                    name={row.name}
-                    logo={row.logo}
-                    date={row.date}
-                    price={row.price}
-                  />
-                );
-              })}
-              <Text color='gray.400' fontSize='xs' my='18px'>
-                OLDER
-              </Text>
-              {olderTransactions.map((row) => {
-                return (
-                  <TransactionRow
-                    name={row.name}
-                    logo={row.logo}
-                    date={row.date}
-                    price={row.price}
-                  />
-                );
-              })}
-            </Flex>
-          </CardBody>
-        </Card>
-      </Grid>
+              </Button>
+              <Button 
+                _hover={{ bg: (page * salesPerPage) >= totalSales ? "gray.400" : "purple.500" }}
+                bg={(page * salesPerPage) >= totalSales ? "gray.300" : "brand.200"}
+                disabled={(page * salesPerPage) >= totalSales}
+                onClick={handleIncrementPage}
+                width={{ base: "70px", md: "70px" }}
+                marginLeft={{ base: "30px", md: "0px" }}
+              >
+                <Text fontSize="lg" color="#fff" fontWeight="bold">
+                  {'>'}
+                </Text>
+              </Button>
+          </Flex>
+        </CardBody>
+      </Card>
+
+      <Card my="22px" overflowX={{ sm: "scroll", xl: "hidden" }} pb="0px">
+        {/* <CardHeader p="6px 0px 22px 0px">
+          <Flex direction="column">
+            <Text fontSize="lg" color="#fff" fontWeight="bold" mb=".5rem">
+              Listado de Ventas
+            </Text>
+          </Flex>
+        </CardHeader> */}
+        <CardBody>
+          <Table variant="simple" color="#fff">
+            <Thead>
+              <Tr my=".8rem" ps="0px">
+                <Th color="gray.400">Cliente</Th>
+                <Th color="gray.400">Medio de Pago</Th>
+                <Th color="gray.400">Fecha de Venta</Th>
+                <Th color="gray.400">Total</Th>
+                <Th color="gray.400">Estado</Th>
+                <Th></Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {sales.length !== 0 ? (
+                <Tr>
+                  <Th colSpan="6" textAlign="center" color="gray.400">
+                    No se encontraron resultados
+                  </Th>
+                </Tr>
+              ) :
+              salesData.map((row, index) => (
+                <TableRowSales
+                  key={index}
+                  customerName={row.customerName}
+                  payment={row.product}
+                  saleDate={row.saleDate}
+                  totalSale={row.totalSale}
+                  status={row.status}
+                  onViewDetails={() => handleViewDetails(row)}
+                />
+              ))}
+            </Tbody>
+          </Table>
+        </CardBody>
+      </Card>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>{selectedSale ? "Detalles de Venta" : "Agregar Venta"}</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <ModalSaleForm sale={selectedSale} onClose={onClose} />
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={onClose}>
+              Cerrar
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <CustomModal
+				header="Upss!"
+				message={err}
+				isOpen={isOpenErr}
+				onClose={onCloseErr}
+        zIndex="1300"
+			/>
+      {loading && <DotSpin message={msg} />}
     </Flex>
   );
 }
 
-export default SalesV2;
+export default Sales;

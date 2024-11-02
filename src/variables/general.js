@@ -486,3 +486,30 @@ export const olderTransactions = [
     logo: FaArrowDown,
   },
 ];
+
+export const salesData = [
+  {
+    customerName: "Carlos Pérez",
+    product: "Camiseta Deportiva",
+    saleDate: "2024-10-10",
+    payment: "Tarjeta de Crédito",
+    totalSale: "$35",
+    status: "Completa",
+  },
+  {
+    customerName: "Ana Gomez",
+    product: "Vestido de Fiesta",
+    saleDate: "2024-10-12",
+    payment: "Yape",
+    totalSale: "$120",
+    status: "Completa",
+  },
+  {
+    customerName: "Luis Rojas",
+    product: "Zapatos de Cuero",
+    saleDate: "2024-10-14",
+    payment: "Plin",
+    totalSale: "$85",
+    status: "Pendiente",
+  },
+];

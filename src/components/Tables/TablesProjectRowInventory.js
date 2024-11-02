@@ -12,7 +12,7 @@ import {
 import { FaPencilAlt, FaWhatsapp, FaUserCircle, FaRegFileExcel } from 'react-icons/fa';
 
 function TableRowInventory(props) {
-  const { logo, name, status, budget, category, progression, lastItem } = props;
+  const { name, stock, price, category, progression, lastItem, onEdit } = props;
   const textColor = useColorModeValue("gray.700", "white");
   return (
     <Tr>
@@ -30,12 +30,12 @@ function TableRowInventory(props) {
       </Td>
       <Td borderBottomColor='#56577A' border={lastItem ? "none" : null}>
         <Text fontSize='sm' color='#fff' fontWeight='bold' pb='.5rem'>
-          {budget}
+          S/.{price}
         </Text>
       </Td>
       <Td borderBottomColor='#56577A' border={lastItem ? "none" : null}>
         <Text fontSize='sm' color='#fff' fontWeight='bold' pb='.5rem'>
-          {status}
+          {stock}
         </Text>
       </Td>
       <Td borderBottomColor='#56577A' border={lastItem ? "none" : null}>
@@ -63,7 +63,7 @@ function TableRowInventory(props) {
       <Td borderBottomColor='#56577A' border={lastItem ? "none" : null}>
       <Flex direction={{ base: "column", md: "row" }} gap="20px">
         <Button
-          /* onClick={onOpenEdit} */
+          onClick={onEdit}
           borderRadius='12px'
           bg='brand.200'
           _hover={{ opacity: '0.8' }}
