@@ -24,6 +24,7 @@ function TablesTableRow(props) {
     date,
     lastItem,
     onEdit,
+    onUpdateStatus,
   } = props;
   // const textColor = useColorModeValue("gray.700", "white");
   // const bgStatus = useColorModeValue("gray.400", "#1a202c");
@@ -127,7 +128,7 @@ function TablesTableRow(props) {
             </Text>
           </Button>
           <Button
-            /* onClick={onOpenEdit} */
+            onClick={onUpdateStatus}
             borderRadius='12px'
             bg={status ? 'red.500' : 'green.500'}
             _hover={{ opacity: '0.8' }}

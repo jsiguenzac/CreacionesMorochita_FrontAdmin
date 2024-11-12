@@ -77,3 +77,21 @@ export const UserUpdateService = async (form) => {
     else
         return { exito: false, msg: result?.data?.mensaje};
 }
+
+export const UserUpdateStatusService = async (id, is_active) => {
+    const [result, error] = await doRequest(
+        `/User/Update/Status?id_user=${Number(id)}&is_active=${is_active}`,
+        "PUT",
+        null,
+        getToken()
+    );
+    
+    if (error)
+        return;
+    
+    const state = result?.state;
+    if(state === 1)
+        return { exito: result?.data?.exito, msg: result?.data?.mensaje};
+    else
+        return { exito: false, msg: result?.data?.mensaje};
+}

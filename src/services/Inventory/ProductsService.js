@@ -76,3 +76,24 @@ export const ProductUpdateService = async (form) => {
     else
         return { exito: false, msg: result?.data?.mensaje};
 }
+
+export const ProductFindByNameService = async (nameForm) => {
+    const body = {
+        name: nameForm.trim()
+    };
+    const [result, error] = await doRequest(
+        "/Products/ByName",
+        "POST",
+        body,
+        getToken()
+    );
+    
+    if (error)
+        return;
+
+    const state = result?.state;
+    if(state === 1)
+        return { data: result?.data?.products, msg: result?.data?.mensaje};
+    else
+        return { exito: false, msg: result?.data?.mensaje};
+}

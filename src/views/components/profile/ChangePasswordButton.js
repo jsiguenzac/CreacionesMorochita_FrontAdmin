@@ -141,7 +141,7 @@ export const ChangePasswordButtom = ({ isOpen, onClose }) => {
     }
     
     return (
-        <Modal isOpen={isOpen} onClose={handleCloseAndClearFields}>
+        <Modal isOpen={isOpen} onClose={handleCloseAndClearFields} isCentered>
             <ModalOverlay />
             <ModalContent maxW="400px" bgGradient="linear(to-br, brand.600, brand.800)">
                 <ModalHeader color="white">Cambiar Contraseña</ModalHeader>

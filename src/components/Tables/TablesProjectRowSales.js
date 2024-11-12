@@ -40,7 +40,7 @@ function TableRowSales({ customerName, payment, saleDate, totalSale, status, onV
       </Td>
       <Td>
         <Text fontSize="sm" color="#fff" fontWeight="bold">
-          {totalSale}
+          S/.{totalSale}
         </Text>
       </Td>
       <Td>

@@ -35,18 +35,26 @@ import CardBody from "components/Card/CardBody.js";
 import TableRowSales from "components/Tables/TablesProjectRowSales";
 import { salesData } from "variables/general";
 import { StatusListService } from "services/Sales/StatusSales";
-import { SalesListService } from "services/Sales/SalesService";
+import { PaymentsListService } from "services/Sales/PaymentsService";
+import {
+  SalesListService,
+  SalesCreateService,
+  SalesUpdateService,
+  SalesDetailsService
+} from "services/Sales/SalesService";
 import { UserListService } from "services/Users/UserService";
 import DotSpin from "components/utils/BounciLoader";
 import { CustomModal } from "components/Modal/ModalMessage";
 import { dateToTimestamp } from "components/utils/Methods";
 
 // Componente personalizado
-import ModalSaleForm from "../components/sales/ModalSaleForm";
+import ModalSalesForm from "../components/sales/ModalSalesForm";
 
 function Sales() {
   const [sellers, setSellers] = useState([]);
   const [status, setStatus] = useState([]);
+  const [payments, setPayments] = useState([]);
+  const [productsDetails, setProductsDetails] = useState([]);
   const [idStatus, setIdStatus] = useState(0);
   const [idSeller, setIdSeller] = useState(0);
   const [sales, setSales] = useState([]);
@@ -93,6 +101,28 @@ function Sales() {
     catch (error) {
       console.error("Error al obtener la lista de estados:", error);
       setErr("Error al obtener los estados");
+      onOpenErr();
+    }
+    finally {
+      setLoading(false);
+      setMsg("");
+    }
+  }
+  const handlePaymentsList = async () => {
+    setLoading(true);
+    setMsg("Cargando métodos de pago...");
+    try {
+      const { data, msg } = await PaymentsListService();
+      if (data) {
+        setPayments(data);
+      }
+      else {
+        setErr("Error al obtener los métodos de pago");
+        onOpenErr();
+      }
+    }
+    catch (error) {
+      setErr("Error inesperado al obtener los métodos de pago");
       onOpenErr();
     }
     finally {
@@ -171,6 +201,7 @@ function Sales() {
   useEffect(() => {
     // llamada de servicios al cargar la vista
     handleStatusList();
+    handlePaymentsList();
     handleSellerList();
     handleApplyFilters();
 		if (onCloseErr) {
@@ -210,18 +241,166 @@ function Sales() {
 
   const { isOpen: isOpenErr, onOpen: onOpenErr, onClose: onCloseErr } = useDisclosure();
   const toast = useToast();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isOpenModal, setIsOpenModal] = useState(false);
   const [selectedSale, setSelectedSale] = useState(null);
 
-  const handleAddSale = () => {
+  const handleCloseModal = () => {
+    setIsOpenModal(false);
     setSelectedSale(null);
-    onOpen();
+    setProductsDetails([]);
   };
 
-  const handleViewDetails = (sale) => {
-    setSelectedSale(sale);
-    onOpen();
+  const handleOpenModal = (sale) => {
+    if (sale)
+      handleDetailsSale(sale.id_sale);
+    else
+      setProductsDetails([]);
+    setSelectedSale(sale || null);
+    setIsOpenModal(true);
   };
+
+  const handleAddSaleService = async (data) => {
+    const { exito, msg, prod } = await SalesCreateService(data);
+    if (exito) {
+      handleCloseModal();
+      toast({
+        title: "Éxito",
+        description: "Venta guardada exitosamente",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+    else if (msg === "STOCK_INSUFICIENTE"){
+      toast({
+        title: "¡Error!",
+        description: `No hay suficiente stock para el producto ${prod}`,
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+    else if (msg === "PRODUCTO_NO_ENCONTRADO"){
+      data.products.find(p => p.id === prod).name;
+      toast({
+        title: "¡Error!",
+        description: `No se encontró el producto ${prod} en la base de datos`,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+    else{
+      toast({
+        title: "Ups..",
+        description: "Ocurrió un error inesperado al guardar la venta",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const handleUpdateSaleService = async (data) => {
+    const { exito, msg, prod } = await SalesUpdateService(data);
+    if (exito) {
+      handleCloseModal();
+      toast({
+        title: "Éxito",
+        description: "Venta actualizada exitosamente",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+    else if (msg === "STOCK_INSUFICIENTE"){
+      toast({
+        title: "¡Error!",
+        description: `No hay suficiente stock para el producto ${prod}`,
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+    else if (msg === "PRODUCTO_NO_ENCONTRADO"){
+      data.products.find(p => p.id === prod).name;
+      toast({
+        title: "¡Error!",
+        description: `No se encontró el producto ${prod} en la base de datos`,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+    else{
+      toast({
+        title: "Ups..",
+        description: "Ocurrió un error inesperado al actualizar la venta",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const handleGestionarVenta = async (sale) => {
+    setLoading(true);
+    try {
+      if (!sale) {
+        setErr("Error al obtener los datos de la venta");
+        onOpenErr();
+        return;
+      } else if (sale.id) {
+        setMsg("Actualizando venta...");
+        await handleUpdateSaleService(sale);
+      } else {
+        setMsg("Registrando venta...");
+        await handleAddSaleService(sale);
+      }
+    }
+    catch (error) {
+      console.error("Error al gestionar la venta:", error);
+      setErr("Error inesperado al gestionar la venta");
+      onOpenErr();
+    }
+    finally {
+      setApplyFiltersFlag(true);
+      setLoading(false);
+      setMsg("");
+    }
+  }
+
+  const handleDetailsSale = async (id_sale) => {
+    if (!id_sale) return;
+    setLoading(true);
+    setMsg("Cargando detalle...");
+    try {
+      const { data, msg } = await SalesDetailsService(id_sale);
+      if (data) {
+        setProductsDetails(data.map((product) => ({
+          id: product.id_product,
+          name: product.name_product,
+          price: product.price,
+          stock: product.stock,
+          talla: product.talla,
+          quantity: product.quantity,
+          subtotal: product.subtotal
+        })));
+      }
+      else {
+        setErr("Error al obtener el detalle de la venta");
+        onOpenErr();
+      }
+    }
+    catch (error) {
+      setErr("Error inesperado al obtener los detalles de la venta");
+      onOpenErr();
+    }
+    finally {
+      setLoading(false);
+      setMsg("");
+    }
+  }
 
   return (
     <Flex direction="column" pt={{ base: "120px", md: "75px" }}>
@@ -235,18 +414,18 @@ function Sales() {
           <Button
             marginLeft={{ base: "50px", md: "auto" }}
             colorScheme="blue"
-            onClick={handleAddSale}
+            onClick={() => handleOpenModal()}
           >
             Nueva Venta
           </Button>
         </CardHeader>
         <CardBody>
           <Flex direction={{ base: "column", md: "row" }} gap="20px">
-          <FormControl>
+            <FormControl>
               <FormLabel color="gray.400">Vendedor</FormLabel>
-              <Menu>
+              <Menu matchWidth>
                 <MenuButton
-                  width={{ base: "100%", md: "220px" }}
+                  width={{ base: "100%", md: "100%" }}
                   border="1px solid #4B5563"
                   as={Button}
                   rightIcon={<ChevronDownIcon color={filters.seller ? "white" : "gray.200"} />}
@@ -255,16 +434,24 @@ function Sales() {
                   _hover={{ bg: "none", borderColor: "gray.300" }}
                   _active={{ bg: "none", borderColor: "white" }}
                 >
-                  {filters.seller || "Seleccionar Vendedor"}
+                  {filters.seller || "Seleccionar"}
                 </MenuButton>
-                <MenuList bg="gray.700" color="white" size="12px">
+                <MenuList 
+                  bg="gray.700"
+                  color="white"
+                  size="12px"
+                  overflowY="auto"
+                  maxHeight="200px"
+                  width="100%"
+                  minWidth="unset"
+                >
                   {sellers
                     .map((s) => (
                     <MenuItem
                       size="12px"
                       key={s.id_user}
                       onClick={() => {
-                        setFilters((prevFilters) => ({ ...prevFilters, seller: s.name }));
+                        setFilters((prevFilters) => ({ ...prevFilters, seller: `${s.name} ${s.last_name}` }));
                         setIdSeller(s.id_user);
                       }}
                       /* onClick={() => setFilters({ ...filters, role: rol.name })} */
@@ -279,9 +466,9 @@ function Sales() {
             </FormControl>
             <FormControl>
               <FormLabel color="gray.400">Estado</FormLabel>
-              <Menu>
+              <Menu matchWidth>
                 <MenuButton
-                  width={{ base: "100%", md: "220px" }}
+                  width={{ base: "100%", md: "100%" }}
                   border="1px solid #4B5563"
                   as={Button}
                   rightIcon={<ChevronDownIcon color={filters.status ? "white" : "gray.200"} />}
@@ -290,9 +477,15 @@ function Sales() {
                   _hover={{ bg: "none", borderColor: "gray.300" }}
                   _active={{ bg: "none", borderColor: "white" }}
                 >
-                  {filters.status || "Seleccionar Estado"}
+                  {filters.status || "Seleccionar"}
                 </MenuButton>
-                <MenuList bg="gray.700" color="white" size="12px">
+                <MenuList
+                  bg="gray.700"
+                  color="white"
+                  size="12px" 
+                  width="100%"
+                  minWidth="unset"
+                >
                   {status
                     .map((s) => (
                     <MenuItem
@@ -419,22 +612,25 @@ function Sales() {
               </Tr>
             </Thead>
             <Tbody>
-              {sales.length !== 0 ? (
+              {sales.length === 0 ? (
                 <Tr>
                   <Th colSpan="6" textAlign="center" color="gray.400">
                     No se encontraron resultados
                   </Th>
                 </Tr>
               ) :
-              salesData.map((row, index) => (
+              sales.map((row, index) => (
                 <TableRowSales
-                  key={index}
-                  customerName={row.customerName}
-                  payment={row.product}
-                  saleDate={row.saleDate}
-                  totalSale={row.totalSale}
-                  status={row.status}
-                  onViewDetails={() => handleViewDetails(row)}
+                  key={row.id_sale}
+                  customerName={row.name_client}
+                  payment={row.name_payment}
+                  saleDate={row.date_sale}
+                  totalSale={row.total}
+                  status={row.name_status}
+                  onViewDetails={() => {
+                    handleDetailsSale(row.id_sale);
+                    handleOpenModal(row);
+                  }}
                 />
               ))}
             </Tbody>
@@ -442,7 +638,7 @@ function Sales() {
         </CardBody>
       </Card>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
+      {/* <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>{selectedSale ? "Detalles de Venta" : "Agregar Venta"}</ModalHeader>
@@ -456,7 +652,16 @@ function Sales() {
             </Button>
           </ModalFooter>
         </ModalContent>
-      </Modal>
+      </Modal> */}
+      <ModalSalesForm
+        isOpen={isOpenModal}
+        onClose={handleCloseModal}
+        onSubmit={(data) => handleGestionarVenta(data)}
+        sale={selectedSale}
+        detailsProd={productsDetails}
+        status={status}
+        payment={payments}
+      />
       <CustomModal
 				header="Upss!"
 				message={err}

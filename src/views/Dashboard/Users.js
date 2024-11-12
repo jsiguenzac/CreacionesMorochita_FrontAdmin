@@ -41,15 +41,17 @@ import TablesTableRow from "components/Tables/TablesTableRow";
 // Data
 import { tablesTableData } from "variables/general";
 import ModalUserForm from "../components/users/ModalUserForm";
+import ModalUserUpdateStatus from "../components/users/ModalUserUpdateStatus";
 
 import { dateToTimestamp } from "components/utils/Methods";
 import { RolLisService } from "services/Users/RolService";
-import { UserListService, UserUpdateService, UserCreateService } from "services/Users/UserService";
+import { UserListService, UserCreateService, UserUpdateService, UserUpdateStatusService } from "services/Users/UserService";
 import DotSpin from "components/utils/BounciLoader";
 import { CustomModal } from "components/Modal/ModalMessage";
 
 function Users() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalUpdateStatusOpen, setIsModalUpdateStatusOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [roles, setRoles] = useState([]);
   const [listUsers, setListUsers] = useState([]);
@@ -73,6 +75,17 @@ function Users() {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setEditingUser(null);
+  };
+  // para abrir el modal de actualizar estado (activar/desactivar)
+  const handleOpenModalUpdateStatus = (user) => {
+    if (!user) return;
+    setEditingUser(user);
+    setIsModalUpdateStatusOpen(true);
+  };
+
+  const handleCloseModalUpdateStatus = () => {
+    setIsModalUpdateStatusOpen(false);
     setEditingUser(null);
   };
 
@@ -188,6 +201,56 @@ function Users() {
       setMsg("");
     }
     setApplyFiltersFlag(true);
+  };
+
+  const handleUpdateStatusUser = async (data) => {
+    try {
+      setLoading(true);
+      console.log("data", data);
+      const statusChange = !data.is_active;
+      setMsg(`${statusChange ? "Activando" : "Inactivando"} usuario...`);
+      const {exito, msg} = await UserUpdateStatusService(data.id, statusChange);
+      if (exito) {
+        toast({
+          title: "Éxito",
+          description: `Usuario ${statusChange ? "activado" : "inactivado"} exitosamente`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        setApplyFiltersFlag(true);
+        handleCloseModalUpdateStatus();
+      }
+      else {
+        if (msg === "USUARIO_NO_ENCONTRADO") {
+          toast({
+            title: "¡Error!",
+            description: "El usuario no fue encontrado, por favor recargue la página",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        }
+        else {
+          toast({
+            title: "Ups..",
+            description: "Ocurrió un error inesperado al actualizar el estado del usuario",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        }
+      }
+    }
+    catch (error) {
+      console.error("Error al actualizar el estado del usuario:", error);
+      setErr("Error al actualizar el estado del usuario");
+      onOpenErr();
+    }
+    finally {
+      setLoading(false);
+      setMsg("");
+    }
   };
 
   // Función para obtener la fecha actual
@@ -536,6 +599,7 @@ function Users() {
                     date={row.date_creation}
                     lastItem={index === arr.length - 1 ? true : false}
                     onEdit={() => handleOpenModal(row)}
+                    onUpdateStatus={() => handleOpenModalUpdateStatus(row)}
                   />
                 );
               })}
@@ -549,6 +613,12 @@ function Users() {
         onSubmit={(data) => handleAddEditUser(data)}
         user={editingUser}
         roles={roles}
+      />
+      <ModalUserUpdateStatus
+        isOpen={isModalUpdateStatusOpen}
+        onClose={handleCloseModalUpdateStatus}
+        onSubmit={(data) => handleUpdateStatusUser(data)}
+        user={editingUser}
       />
       <CustomModal
 				header="Upss!"

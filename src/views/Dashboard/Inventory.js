@@ -356,7 +356,7 @@ function Inventory() {
                   _hover={{ bg: "none", borderColor: "gray.300" }}
                   _active={{ bg: "none", borderColor: "white" }}
                 >
-                  {filters.category || "Seleccionar Estado"}
+                  {filters.category || "Seleccionar Categoria"}
                 </MenuButton>
                 <MenuList bg="gray.700" color="white" size="12px">
                   {categoryList

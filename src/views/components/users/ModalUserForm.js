@@ -101,7 +101,7 @@ const ModalUserForm = ({ isOpen, onClose, onSubmit, user, roles }) => {
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleCancel}>
+    <Modal isOpen={isOpen} onClose={handleCancel} isCentered>
       <ModalOverlay />
       <ModalContent
         overflowY="auto"

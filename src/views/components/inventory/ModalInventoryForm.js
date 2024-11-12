@@ -101,7 +101,7 @@ const ModalInventoryForm = ({ isOpen, onClose, onSubmit, product, categories, pr
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={handleCancel}>
+    <Modal isOpen={isOpen} onClose={handleCancel} isCentered>
       <ModalOverlay />
       <ModalContent
         overflowY="auto"
