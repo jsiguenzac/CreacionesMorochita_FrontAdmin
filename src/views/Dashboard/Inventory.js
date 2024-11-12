@@ -317,129 +317,128 @@ function Inventory() {
       {/* Filtros */}
       <Card mb="22px">
         <CardHeader p="6px 0px 22px 0px">
-        <Flex direction={{ base: "column", md: "row" }} gap="20px">
-          <Text fontSize="lg" color="#fff" fontWeight="bold">
-            Filtros
-          </Text>
-        </Flex>
-        <Button
-          marginLeft={{ base: "50px", md: "auto" }}
-          colorScheme="blue" 
-          onClick={() => handleOpenModal()}>
+          <Flex direction={{ base: "column", md: "row" }} gap="20px">
+            <Text fontSize="lg" color="#fff" fontWeight="bold">
+              Filtrar Productos
+            </Text>
+          </Flex>
+          <Button
+            mt={{ base: "10px", md: "0" }}
+            marginLeft={{ base: "0", md: "auto" }}
+            alignSelf={{ base: "flex-end", lg: "flex-end" }}
+            colorScheme="blue"
+            onClick={() => handleOpenModal()}
+          >
             Agregar Producto
           </Button>
         </CardHeader>
         <CardBody>
-          <Flex direction={{ base: "column", md: "row" }} gap="20px">
-            <FormControl>
-              <FormLabel color="gray.400">Nombre</FormLabel>
-              <Input
-                name="name"
-                width={{ base: "100%", md: "180px" }}
-                placeholder="Buscar por nombre"
-                value={filters.name}
-                onChange={handleInputChange}
-                color="#fff"
-                borderColor="gray.600"
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel color="gray.400">Categoria</FormLabel>
-              <Menu>
-                <MenuButton
-                  width={{ base: "100%", md: "220px" }}
-                  border="1px solid #4B5563"
-                  as={Button}
-                  rightIcon={<ChevronDownIcon color={filters.category ? "white" : "gray.200"} />}
-                  bg="none" 
-                  bord color={!filters.category ? "gray.500" : "white" } 
-                  _hover={{ bg: "none", borderColor: "gray.300" }}
-                  _active={{ bg: "none", borderColor: "white" }}
-                >
-                  {filters.category || "Seleccionar Categoria"}
-                </MenuButton>
-                <MenuList bg="gray.700" color="white" size="12px">
-                  {categoryList
-                    .map((c) => (
-                    <MenuItem
-                      size="12px"
-                      key={c.id}
-                      onClick={() => {
-                        setFilters((prevFilters) => ({ ...prevFilters, category: c.name }));
-                        setIdCategory(c.id);
-                      }}
-                      _hover={{ bg: "purple.500" }}
-                      _focus={{ bg: "purple.500" }}
-                    >
-                      {c.name}
-                    </MenuItem>
-                  ))}
-                </MenuList>
-              </Menu>
-            </FormControl>
-          </Flex>
-          {/* Flex for the buttons */}
           <Flex
-            mt="30px"
-            marginStart={{ base: "0px", md: "20px" }}
-            justifyContent="flex-end"
-            gap="10px"
-            direction={{ base: "column", md: "row" }}
+            direction={{ base: "column", lg: "row" }}
+            gap="20px"
+            justifyContent="space-between"
+            alignItems="center"
+            width={{ base: "100%", md: "auto" }}
           >
-            <Button
-              _hover={{ bg: "brand.300" }}
-              bg={"brand.200"}
-              textColor={"white"}
-              onClick={handleApplyFilters}
-              width={{ base: "100px", md: "auto" }}
-              marginLeft={{ base: "30px", md: "0px" }}
-            >
-              Aplicar
-            </Button>
-            <Button
-              _hover={{ bg: "white" }}
-              bg={"gray.300"}
-              disabled={Object.values(filters).every((filter) => filter === "")}
-              onClick={handleClearFilters}
-              width={{ base: "100px", md: "auto" }}
-              marginLeft={{ base: "30px", md: "0px" }}
-            >
-              Limpiar
-            </Button>
+            <Flex direction={{ base: "column", md: "row" }} gap="20px" flex="1">
+              <FormControl>
+                <FormLabel color="gray.400">Nombre</FormLabel>
+                <Input
+                  name="name"
+                  width={{ base: "100%", md: "180px" }}
+                  placeholder="Buscar por nombre"
+                  value={filters.name}
+                  onChange={handleInputChange}
+                  color="#fff"
+                  borderColor="gray.600"
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel color="gray.400">Categoria</FormLabel>
+                <Menu>
+                  <MenuButton
+                    width={{ base: "100%", md: "220px" }}
+                    border="1px solid #4B5563"
+                    as={Button}
+                    rightIcon={<ChevronDownIcon color={filters.category ? "white" : "gray.200"} />}
+                    bg="none"
+                    color={!filters.category ? "gray.500" : "white"}
+                    _hover={{ bg: "none", borderColor: "gray.300" }}
+                    _active={{ bg: "none", borderColor: "white" }}
+                  >
+                    {filters.category || "Seleccionar Categoria"}
+                  </MenuButton>
+                  <MenuList bg="gray.700" color="white" size="12px">
+                    {categoryList.map((c) => (
+                      <MenuItem
+                        key={c.id}
+                        onClick={() => {
+                          setFilters((prevFilters) => ({ ...prevFilters, category: c.name }));
+                          setIdCategory(c.id);
+                        }}
+                        _hover={{ bg: "purple.500" }}
+                        _focus={{ bg: "purple.500" }}
+                      >
+                        {c.name}
+                      </MenuItem>
+                    ))}
+                  </MenuList>
+                </Menu>
+              </FormControl>
+            </Flex>
+
             <Flex
-              marginStart={{ base: "0px", md: "50px", lg: "50px" }}
-              justifyContent="flex-end"
+              mt={{ base: "30px", lg: "0" }}
+              alignSelf={{ base: "flex-end", lg: "flex-end" }}
+              alignItems={{ base: "center", lg: "flex-end" }}
+              justifyContent={{ base: "center", lg: "flex-end" }}
               gap="10px"
               direction={{ base: "column", md: "row" }}
+              width={{ base: "100%", md: "auto" }}
             >
+              <Button
+                _hover={{ bg: "brand.300" }}
+                bg="brand.200"
+                textColor="white"
+                onClick={handleApplyFilters}
+                width={{ base: "100%", md: "auto" }}
+              >
+                Aplicar
+              </Button>
+              <Button
+                _hover={{ bg: "white" }}
+                bg="gray.300"
+                disabled={Object.values(filters).every((filter) => filter === "")}
+                onClick={handleClearFilters}
+                width={{ base: "100%", md: "auto" }}
+              >
+                Limpiar
+              </Button>
               <Button
                 _hover={{ bg: page === 1 ? "gray.400" : "purple.500" }}
                 bg={page === 1 ? "gray.300" : "brand.200"}
                 disabled={page === 1}
                 onClick={handleDecrementPage}
-                width={{ base: "70px", md: "70px" }}
-                marginLeft={{ base: "30px", md: "50px" }}
+                width={{ base: "100%", md: "auto" }}
+                textColor={page === 1 ? "gray.500" : "white"}
               >
-                <Text fontSize="lg" color="#fff" fontWeight="bold">
-                  {'<'}
-                </Text>
+                {'<'}
               </Button>
               <Button
                 _hover={{ bg: (page * productsPerPage) >= totalProducts ? "gray.400" : "purple.500" }}
                 bg={(page * productsPerPage) >= totalProducts ? "gray.300" : "brand.200"}
                 disabled={(page * productsPerPage) >= totalProducts}
                 onClick={handleIncrementPage}
-                width={{ base: "70px", md: "70px" }}
-                marginLeft={{ base: "30px", md: "0px" }}
+                width={{ base: "100%", md: "auto" }}
+                textColor={(page * productsPerPage) >= totalProducts ? "gray.500" : "white"}
               >
-                <Text fontSize="lg" color="#fff" fontWeight="bold">
-                  {'>'}
-                </Text>
+                {'>'}
               </Button>
             </Flex>
           </Flex>
         </CardBody>
       </Card>
+
       {/* Clients Table */}
       <Card my='22px' overflowX={{ sm: "scroll", xl: "hidden" }} pb='0px'>
         {/* <CardHeader p='6px 0px 22px 0px'>

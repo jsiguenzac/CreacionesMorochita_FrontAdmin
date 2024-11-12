@@ -376,149 +376,147 @@ function Users() {
       {/* Filtros */}
       <Card mb="22px">
         <CardHeader p="6px 0px 22px 0px">
-        <Flex direction={{ base: "column", md: "row" }} gap="20px">
-          <Text fontSize="lg" color="#fff" fontWeight="bold">
-            Filtrar Usuarios
-          </Text>
-        </Flex>
-        <Button
-          marginLeft={{ base: "50px", md: "auto" }}
-          colorScheme="blue" 
-          onClick={() => handleOpenModal()}>
+          <Flex direction={{ base: "column", md: "row" }} gap="20px">
+            <Text fontSize="lg" color="#fff" fontWeight="bold">
+              Filtrar Usuarios
+            </Text>
+          </Flex>
+          <Button
+            mt={{ base: "10px", md: "0" }}
+            marginLeft={{ base: "0", md: "auto" }}
+            alignSelf={{ base: "flex-end", lg: "flex-end" }}
+            colorScheme="blue"
+            onClick={() => handleOpenModal()}
+          >
             Agregar Usuario
           </Button>
         </CardHeader>
         <CardBody>
-          <Flex direction={{ base: "column", md: "row" }} gap="20px">
-            <FormControl>
-              <FormLabel color="gray.400">Nombre</FormLabel>
-              <Input
-                name="name"
-                width={{ base: "100%", md: "180px" }}
-                placeholder="Buscar por nombre"
-                value={filters.name}
-                onChange={handleInputChange}
-                color="#fff"
-                borderColor="gray.600"
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel color="gray.400">Rol</FormLabel>
-              <Menu>
-                <MenuButton
-                  width={{ base: "100%", md: "220px" }}
-                  border="1px solid #4B5563"
-                  as={Button}
-                  rightIcon={<ChevronDownIcon color={filters.role ? "white" : "gray.200"} />}
-                  bg="none" 
-                  bord color={!filters.role ? "gray.500" : "white" } 
-                  _hover={{ bg: "none", borderColor: "gray.300" }}
-                  _active={{ bg: "none", borderColor: "white" }}
-                >
-                  {filters.role || "Seleccionar rol"}
-                </MenuButton>
-                <MenuList bg="gray.700" color="white" size="12px">
-                  {roles
-                    .filter((rol) => rol.id !== 5)
-                    .map((rol) => (
-                    <MenuItem
-                      size="12px"
-                      key={rol.id}
-                      onClick={() => {
-                        setFilters((prevFilters) => ({ ...prevFilters, role: rol.name }));
-                        setIdRol(rol.id);
-                      }}
-                      /* onClick={() => setFilters({ ...filters, role: rol.name })} */
-                      _hover={{ bg: "purple.500" }}
-                      _focus={{ bg: "purple.500" }}
-                    >
-                      {rol.name}
-                    </MenuItem>
-                  ))}
-                </MenuList>
-              </Menu>
-            </FormControl>
-            <FormControl>
-              <FormLabel color="gray.400">Fecha de Creación</FormLabel>
-              <InputGroup
-                width={{ base: "100%", md: "auto" }}
-              >
-                <InputRightElement pointerEvents="none">
-                  <CalendarIcon 
-                    color="gray.400"
-                    marginRight="55px"
-                  />
-                </InputRightElement>
+          <Flex
+            direction={{ base: "column", lg: "row" }}
+            gap="20px"
+            justifyContent="space-between"
+            alignItems="center"
+            width={{ base: "100%", md: "auto" }}
+          >
+            {/* Filtros */}
+            <Flex direction={{ base: "column", md: "row" }} gap="20px" flex="1">
+              <FormControl>
+                <FormLabel color="gray.400">Nombre</FormLabel>
                 <Input
-                  type="date"
-                  pl="10px"
-                  name="creationDate"
-                  value={filters.creationDate}
+                  name="name"
+                  width={{ base: "100%", md: "180px" }}
+                  placeholder="Buscar por nombre"
+                  value={filters.name}
                   onChange={handleInputChange}
                   color="#fff"
                   borderColor="gray.600"
-                  max={today}
                 />
-              </InputGroup>
-            </FormControl>
-          </Flex>
-          {/* Flex for the buttons */}
-          <Flex
-            mt="30px"
-            marginStart={{ base: "0px", md: "20px" }}
-            justifyContent="flex-end"
-            gap="10px"
-            direction={{ base: "column", md: "row" }}
-          >
-            <Button
-              _hover={{ bg: "brand.300" }}
-              bg={"brand.200"}
-              textColor={"white"}
-              onClick={handleApplyFilters}
-              width={{ base: "100px", md: "auto" }}
-              marginLeft={{ base: "30px", md: "0px" }}
-            >
-              Aplicar
-            </Button>
-            <Button
-              _hover={{ bg: "white" }}
-              bg={"gray.300"}
-              disabled={Object.values(filters).every((filter) => filter === "") && page === 1}
-              onClick={handleClearFilters}
-              width={{ base: "100px", md: "auto" }}
-              marginLeft={{ base: "30px", md: "0px" }}
-            >
-              Limpiar
-            </Button>
+              </FormControl>
+              <FormControl>
+                <FormLabel color="gray.400">Rol</FormLabel>
+                <Menu>
+                  <MenuButton
+                    width={{ base: "100%", md: "220px" }}
+                    border="1px solid #4B5563"
+                    as={Button}
+                    rightIcon={<ChevronDownIcon color={filters.role ? "white" : "gray.200"} />}
+                    bg="none"
+                    color={!filters.role ? "gray.500" : "white"}
+                    _hover={{ bg: "none", borderColor: "gray.300" }}
+                    _active={{ bg: "none", borderColor: "white" }}
+                  >
+                    {filters.role || "Seleccionar rol"}
+                  </MenuButton>
+                  <MenuList bg="gray.700" color="white" size="12px">
+                    {roles
+                      .filter((rol) => rol.id !== 5)
+                      .map((rol) => (
+                        <MenuItem
+                          key={rol.id}
+                          onClick={() => {
+                            setFilters((prevFilters) => ({ ...prevFilters, role: rol.name }));
+                            setIdRol(rol.id);
+                          }}
+                          _hover={{ bg: "purple.500" }}
+                          _focus={{ bg: "purple.500" }}
+                        >
+                          {rol.name}
+                        </MenuItem>
+                      ))}
+                  </MenuList>
+                </Menu>
+              </FormControl>
+              <FormControl>
+                <FormLabel color="gray.400">Fecha de Creación</FormLabel>
+                <InputGroup width={{ base: "100%", md: "auto" }}>
+                  <InputRightElement pointerEvents="none">
+                    <CalendarIcon 
+                      color="gray.300"
+                      marginRight="60px"
+                    />
+                  </InputRightElement>
+                  <Input
+                    type="date"
+                    pl="10px"
+                    name="creationDate"
+                    value={filters.creationDate}
+                    onChange={handleInputChange}
+                    color="#fff"
+                    borderColor="gray.600"
+                    max={today}
+                  />
+                </InputGroup>
+              </FormControl>
+            </Flex>
+
+            {/* Contenedor de botones */}
             <Flex
-              marginStart={{ base: "0px", md: "50px", lg: "50px" }}
-              justifyContent="flex-end"
+              mt={{ base: "30px", lg: "0" }}
+              alignSelf={{ base: "flex-end", lg: "flex-end" }}
+              alignItems={{ base: "center", lg: "flex-end" }}
+              justifyContent={{ base: "center", lg: "flex-end" }}
               gap="10px"
               direction={{ base: "column", md: "row" }}
+              width={{ base: "100%", md: "auto" }}
             >
+              <Button
+                _hover={{ bg: "brand.300" }}
+                bg="brand.200"
+                textColor="white"
+                onClick={handleApplyFilters}
+                width={{ base: "100%", md: "auto" }}
+              >
+                Aplicar
+              </Button>
+              <Button
+                _hover={{ bg: "white" }}
+                bg="gray.300"
+                disabled={Object.values(filters).every((filter) => filter === "") && page === 1}
+                onClick={handleClearFilters}
+                width={{ base: "100%", md: "auto" }}
+              >
+                Limpiar
+              </Button>
               <Button
                 _hover={{ bg: page === 1 ? "gray.400" : "purple.500" }}
                 bg={page === 1 ? "gray.300" : "brand.200"}
                 disabled={page === 1}
                 onClick={handleDecrementPage}
-                width={{ base: "70px", md: "70px" }}
-                marginLeft={{ base: "30px", md: "50px" }}
+                width={{ base: "100%", md: "auto" }}
+                textColor={page === 1 ? "gray.500" : "white"}
               >
-                <Text fontSize="lg" color="#fff" fontWeight="bold">
-                  {'<'}
-                </Text>
+                {'<'}
               </Button>
-              <Button 
+              <Button
                 _hover={{ bg: (page * usersPerPage) >= totalUsers ? "gray.400" : "purple.500" }}
                 bg={(page * usersPerPage) >= totalUsers ? "gray.300" : "brand.200"}
                 disabled={(page * usersPerPage) >= totalUsers}
                 onClick={handleIncrementPage}
-                width={{ base: "70px", md: "70px" }}
-                marginLeft={{ base: "30px", md: "0px" }}
+                width={{ base: "100%", md: "auto" }}
+                textColor={(page * usersPerPage) >= totalUsers ? "gray.500" : "white"}
               >
-                <Text fontSize="lg" color="#fff" fontWeight="bold">
-                  {'>'}
-                </Text>
+                {'>'}
               </Button>
             </Flex>
           </Flex>
