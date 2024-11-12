@@ -41,6 +41,9 @@ export default function HeaderLinks(props) {
     navbarIcon = "white";
     mainText = "white";
   }
+
+  const routesServices = routes.filter((route) => route.id < 0);
+
   const settingsRef = React.useRef();
   return (
     <Flex
@@ -114,7 +117,7 @@ export default function HeaderLinks(props) {
         iconColor={navbarIcon}
         logoText={props.logoText}
         secondary={props.secondary}
-        routes={routes}
+        routes={routesServices}
         // logo={logo}
         {...rest}
       />
@@ -130,7 +133,7 @@ export default function HeaderLinks(props) {
       /> */}
       <Menu>
         <MenuButton align='center'>
-          <BellIcon color={navbarIcon} mt='-4px' w='30px' h='18px' /> {/* CAMPANA / NOTIFICACIONES */}
+          <BellIcon display="none" color={navbarIcon} mt='-4px' w='30px' h='18px' /> {/* CAMPANA / NOTIFICACIONES */}
         </MenuButton>
 
         <MenuList

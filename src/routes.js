@@ -4,7 +4,7 @@ import Tables from "views/Dashboard/Tables.js";
 import SalesV2 from "views/Dashboard/SalesV2.js";
 import SalesDetails from "views/Dashboard/SalesDetails.js";
 import Users from "views/Dashboard/Users.js";
-import Client from "views/Dashboard/Client.js";
+import Reports from "views/Dashboard/Reports.js";
 import Inventory from "views/Dashboard/Inventory.js";
 import RTLPage from "views/RTL/RTLPage.js";
 import Profile from "views/Dashboard/Profile.js";
@@ -39,6 +39,7 @@ var dashRoutes = [
   {
     path: "/dashboard",
     name: "Inicio",
+    id: 0,
     rtlName: "لوحة القيادة",
     icon: <HomeIcon color='inherit' />,
     component: Dashboard,
@@ -47,6 +48,7 @@ var dashRoutes = [
   {
     path: "/sales",
     name: "Ventas",
+    id: 1,
     rtlName: "لوحة القيادة",
     icon: <CartIcon color='inherit' />,
     component: SalesV2,
@@ -55,6 +57,7 @@ var dashRoutes = [
   {
     path: "/inventory",
     name: "Inventario",
+    id: 2,
     rtlName: "لوحة القيادة",
     icon: <CreditIcon color='inherit' />,
     component: Inventory,
@@ -63,17 +66,19 @@ var dashRoutes = [
   {
     path: "/users",
     name: "Usuarios",
+    id: 3,
     rtlName: "لوحة القيادة",
     icon: <GlobeIcon color='inherit' />,
     component: Users,
     layout: "/admin",
   },
   {
-    path: "/clients",
-    name: "Clientes",
+    path: "/reports",
+    name: "Reportes",
+    id: 4,
     rtlName: "لوحة القيادة",
     icon: <GlobeIcon color='inherit' />,
-    component: Client,
+    component: Reports,
     layout: "/admin",
   },
   /* {
@@ -86,6 +91,7 @@ var dashRoutes = [
   }, */
   {
     name: "CUENTA",
+    id: -1,
     category: "account",
     rtlName: "صفحات",
     state: "pageCollapse",

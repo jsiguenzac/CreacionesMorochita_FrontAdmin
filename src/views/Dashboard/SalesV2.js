@@ -568,7 +568,6 @@ function Sales() {
         </CardBody>
       </Card>
 
-
       <Card my="22px" overflowX={{ sm: "scroll", xl: "hidden" }} pb="0px">
         {/* <CardHeader p="6px 0px 22px 0px">
           <Flex direction="column">
