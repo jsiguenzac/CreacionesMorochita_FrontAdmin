@@ -165,7 +165,7 @@ export default function Profile() {
 									{dataUser ? `${dataUser?.name || ''} ${dataUser.last_name || ''}` : "Usuario"}
 								</Text>
 								<Text fontSize={{ sm: 'sm', md: 'md' }} color='gray.400'>
-									{dataUser ? dataUser?.email : 'No registrado'}
+									{dataUser ? dataUser?.email : 'Cargando...'}
 								</Text>
 							</Flex>
 						</Flex>
@@ -234,7 +234,7 @@ export default function Profile() {
 						INFORMACIÓN
 						</Text>
 						<Text fontSize="sm" color="gray.400">
-						Hola, {dataUser?.name || 'User'}. Observa tu información actualizada.
+						Hola, {dataUser?.name || 'Usuario'}. Observa tu información actualizada.
 						</Text>
 					</Flex>
 					</CardHeader>
@@ -389,7 +389,7 @@ export default function Profile() {
 							Nombre(s):{' '}
 						</Text>
 						<Text fontSize="sm" color="#fff" fontWeight="400">
-							{dataUser ? dataUser?.name : 'User'}
+							{dataUser ? dataUser?.name : 'Cargando...'}
 						</Text>
 						</Flex>
 						<Flex align="center" mb="18px">
@@ -413,7 +413,7 @@ export default function Profile() {
 							Correo:{' '}
 						</Text>
 						<Text fontSize="sm" color="#fff" fontWeight="400">
-							{dataUser ? dataUser?.email : 'No registrado'}
+							{dataUser ? dataUser?.email : 'Cargando...'}
 						</Text>
 						</Flex>
 						<Flex align="center" mb="18px">
@@ -421,7 +421,7 @@ export default function Profile() {
 							Celular:{' '}
 						</Text>
 						<Text fontSize="sm" color="#fff" fontWeight="400">
-							{dataUser ? dataUser?.phone : 'No registrado'}
+							{dataUser ? dataUser?.phone : 'Cargando...'}
 						</Text>
 						</Flex>
 					</Flex>

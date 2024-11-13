@@ -1,3 +1,5 @@
+import React,{ useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import {
 	Box,
 	Button,
@@ -19,7 +21,8 @@ import {
 	Text,
 	Th,
 	Thead,
-	Tr
+	Tr,
+	transition
 } from '@chakra-ui/react';
 // Styles for the circular progressbar
 import medusa from 'assets/img/cardimgfree.png';
@@ -35,7 +38,6 @@ import IconBox from 'components/Icons/IconBox';
 import { CartIcon, DocumentIcon, GlobeIcon, RocketIcon, StatsIcon, WalletIcon, PersonIcon } from 'components/Icons/Icons.js';
 import DashboardTableRow from 'components/Tables/DashboardTableRow';
 import TimelineRow from 'components/Tables/TimelineRow';
-import React from 'react';
 import { AiFillCheckCircle } from 'react-icons/ai';
 import { BiHappy } from 'react-icons/bi';
 import { BsArrowRight } from 'react-icons/bs';
@@ -48,14 +50,15 @@ import {
 	lineChartOptionsDashboard
 } from 'variables/charts';
 import { dashboardTableData, timelineData } from 'variables/general';
-import { useEffect, useState } from "react";
-import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
 import { getUser } from "services/Auth/tokenService";
 
 export default function Dashboard() {
+	const navigate = useHistory().push;
 	const [dataUser, setDataUser] = useState(null);
 	const user = getUser();
-
+	const goToProfile = () => {
+		navigate("/admin/profile");
+	}
 	useEffect(() => {		
 		document.title = "Morochita | Admin";
 		if (user){
@@ -66,7 +69,9 @@ export default function Dashboard() {
 		<Flex flexDirection='column' pt={{ base: '120px', md: '75px' }}>
 			<SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
 				{/* MiniStatistics Card */}
-				<Card>
+				<Card 
+					_hover={{ bg: 'brand.200', color: '#fff', transition: 'all .5s ease' }}
+				>
 					<CardBody>
 						<Flex flexDirection='row' align='center' justify='center' w='100%'>
 							<Stat me='auto'>
@@ -96,12 +101,15 @@ export default function Dashboard() {
 					</CardBody>
 				</Card>
 				{/* MiniStatistics Card */}
-				<Card minH='83px'>
+				<Card
+					minH='83px' 
+					_hover={{ bg: 'brand.200', color: '#fff', transition: 'all .5s ease' }}
+				>
 					<CardBody>
 						<Flex flexDirection='row' align='center' justify='center' w='100%'>
 							<Stat me='auto'>
 								<StatLabel fontSize='sm' color='gray.400' fontWeight='bold' pb='2px'>
-									Usuarios
+									Inventario
 								</StatLabel>
 								<Flex>
 									<StatNumber fontSize='lg' color='#fff'>
@@ -126,12 +134,14 @@ export default function Dashboard() {
 					</CardBody>
 				</Card>
 				{/* MiniStatistics Card */}
-				<Card>
+				<Card 
+					_hover={{ bg: 'brand.200', color: '#fff', transition: 'all .5s ease' }}
+				>
 					<CardBody>
 						<Flex flexDirection='row' align='center' justify='center' w='100%'>
 							<Stat>
 								<StatLabel fontSize='sm' color='gray.400' fontWeight='bold' pb='2px'>
-									Clientes
+									Usuarios
 								</StatLabel>
 								<Flex>
 									<StatNumber fontSize='lg' color='#fff'>
@@ -157,7 +167,9 @@ export default function Dashboard() {
 					</CardBody>
 				</Card>
 				{/* MiniStatistics Card */}
-				<Card>
+				<Card
+					_hover={{ bg: 'brand.200', color: '#fff', transition: 'all .5s ease' }}
+				>
 					<CardBody>
 						<Flex flexDirection='row' align='center' justify='center' w='100%'>
 							<Stat me='auto'>
@@ -210,7 +222,7 @@ export default function Dashboard() {
 								<Spacer />
 								<Flex align='center'>
 									<Button
-										onClick={() => console.log("Ir al perfil")}
+										onClick={() => goToProfile()}
 										p='0px'
 										variant='no-hover'
 										bg='transparent'

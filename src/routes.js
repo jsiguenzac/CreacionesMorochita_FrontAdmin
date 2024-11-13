@@ -9,6 +9,7 @@ import Inventory from "views/Dashboard/Inventory.js";
 import RTLPage from "views/RTL/RTLPage.js";
 import Profile from "views/Dashboard/Profile.js";
 import SignIn from "views/Pages/SignIn.js";
+import { MdInventory } from "react-icons/md";
 //import SignUp from "views/Pages/SignUp.js";
 
 import {
@@ -59,7 +60,7 @@ var dashRoutes = [
     name: "Inventario",
     id: 2,
     rtlName: "لوحة القيادة",
-    icon: <CreditIcon color='inherit' />,
+    icon: <MdInventory color='inherit' />,
     component: Inventory,
     layout: "/admin",
   },
@@ -77,7 +78,7 @@ var dashRoutes = [
     name: "Reportes",
     id: 5,
     rtlName: "لوحة القيادة",
-    icon: <GlobeIcon color='inherit' />,
+    icon: <DocumentIcon color='inherit' />,
     component: Reports,
     layout: "/admin",
   },
@@ -100,7 +101,7 @@ var dashRoutes = [
         path: "/profile",
         name: "Perfil",
         rtlName: "لوحة القيادة",
-        icon: <PersonIcon color='inherit' />,
+        icon: <ProfileIcon color='inherit' />,
         secondaryNavbar: true,
         component: Profile,
         layout: "/admin",

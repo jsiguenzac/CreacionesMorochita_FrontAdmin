@@ -142,21 +142,21 @@ function Reports() {
       dateCreation: -1,
     };
     setLoading(true);
-    setMsg("Cargando clientes...");
+    setMsg("Aplicando filtros...");
     try {
       const { data, msg } = await UserListService(form);
       if (data) {
         console.log("Clientes:", data);
       }
       else {
-        console.log("Error al obtener la lista de clientes:", msg);
-        setErr("Error al obtener los clientes");
+        console.log("Error al obtener el reporte:", msg);
+        setErr("Error al obtener el reporte");
         onOpenErr();
       }
     }
     catch (error) {
-      console.error("Error al obtener la lista de clientes:", error);
-      setErr("Error al obtener los clientes");
+      console.error("Error al obtener el reporte:", error);
+      setErr("Error inesperado al obtener el reporte");
       onOpenErr();
     }
     finally {
