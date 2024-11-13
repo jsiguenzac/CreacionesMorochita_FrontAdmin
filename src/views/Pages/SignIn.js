@@ -2,8 +2,7 @@ import {React, useState, useEffect} from "react";
 import {useHistory} from "react-router-dom";
 import {getToken} from "../../services/Auth/tokenService";
 import Loading from "../../components/utils/Loading";
-//import BouncingLoader from "../../components/utils/BounciLoader";
-// Chakra imports
+
 import {
   Box,
   Flex,
@@ -24,7 +23,10 @@ import {
 
 // Assets
 import signinImage from "assets/img/fondoHome.png";
-import { LoginService } from "../../services/Auth/tokenService";
+import imgHome from 'assets/img/fondoHome3.jpg';
+import { LoginService, savePermissions, clearAllStorage } from "../../services/Auth/tokenService";
+import { PermissionsListService } from "../../services/Auth/PermissionsService";
+
 // Custom Components
 import AuthFooter from "components/Footer/AuthFooter";
 import GradientBorder from "components/GradientBorder/GradientBorder";
@@ -58,8 +60,18 @@ function signin() {
       setErr("");
       const {logged, msg} = await LoginService(form);
       console.log("auth/signin Successful:", logged);
-      if (logged)
+      if (logged){
+        const { permssions, msg } = await PermissionsListService();
+        console.log("auth/permissions Successful:", permssions);
+        if (!permssions){
+          clearAllStorage();
+          setErr(`Contacta al administrador del sistema para que te asigne permisos`);
+          handleShowModal();
+          return;
+        }
+        savePermissions(permssions);        
         navigate(homePage);
+      }
       else if (msg === "USUARIO_NO_ENCONTRADO")
         setErr("El DNI o Correo Electrónico no está registrado");
       else if (msg === "CLAVE_INCORRECTA")
@@ -67,10 +79,10 @@ function signin() {
       handleShowModal();
     } catch (error) {
       console.error("Error during auth/signin:", error);
+      clearAllStorage();
       return;
     } finally {
       setLoading(false);
-      //navigate(homePage);
     }
   };  
   const { email, password, remind } = form;
@@ -96,6 +108,13 @@ function signin() {
       setShowPassword(!showPassword); // Alternar entre mostrar y ocultar contraseña
   };
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <Flex position='relative'>
@@ -108,6 +127,31 @@ function signin() {
         pt={{ sm: "60px", md: "0px" }}
         flexDirection='column'
         me={{ base: "auto", lg: "50px", xl: "180px" }}> {/* margen derecho form */}
+        
+        {/* <Logo Mobile /> */}
+        {isMobile && (
+          <div style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              position: "absolute",
+              top: "50px",
+              left: 0,
+              right: 0,
+              textAlign: "center"
+            }}
+          >
+            <img
+              src={imgHome}
+              alt="logo"
+              style={{
+                width: "600px",
+                height: "100px",
+                objectFit: "contain"
+              }}
+            />
+          </div>
+        )}
         <Flex
           alignItems='center'
           justifyContent='start'
@@ -120,7 +164,7 @@ function signin() {
             direction='column'
             w='100%'
             background='transparent'
-            mt={{ base: "20px", md: "100px", lg: "120px", xl: "100px" }} // altura del formulario
+            mt={{ base: "50%", md: "100px", lg: "120px", xl: "100px" }} // altura del formulario
             mb={{ base: "60px", lg: "80px" }}>
             <Heading color={titleColor} fontSize='32px' mb='10px'>
               Bienvenid@!

@@ -75,7 +75,7 @@ var dashRoutes = [
   {
     path: "/reports",
     name: "Reportes",
-    id: 4,
+    id: 5,
     rtlName: "لوحة القيادة",
     icon: <GlobeIcon color='inherit' />,
     component: Reports,

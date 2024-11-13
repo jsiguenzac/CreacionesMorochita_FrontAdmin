@@ -1,11 +1,10 @@
-// Chakra imports
+import React, { useState, useEffect } from "react";
 import { ChakraProvider, Portal, useDisclosure } from "@chakra-ui/react";
 import Configurator from "components/Configurator/Configurator";
 import Footer from "components/Footer/Footer.js";
 // Layout components
 import AdminNavbar from "components/Navbars/AdminNavbar.js";
 import Sidebar from "components/Sidebar/Sidebar.js";
-import React, { useState } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import routes from "routes.js";
 // Custom Chakra theme
@@ -18,6 +17,29 @@ import PanelContent from "../components/Layout/PanelContent";
 
 export default function Dashboard(props) {
   const { ...rest } = props;
+
+  const [permissions, setPermissions] = useState(
+    JSON.parse(localStorage.getItem("permissions"))
+  );
+  const [routesServices, setRoutesServices] = useState([]);
+  
+  const handleFilterRoutes = () => {
+    const ids_modules = permissions.map((permission) => permission.id_module);
+    const filteredRoutes = routes.filter((route) => ids_modules.includes(route.id) || route.id <= 0);    
+    setRoutesServices(filteredRoutes);
+  };
+
+  useEffect(() => {
+    if (routesServices.length > 0) return;
+    setPermissions(JSON.parse(localStorage.getItem("permissions")));
+    if (!permissions) {
+      console.log("No permissions");
+      clearAllStorage();
+      return;
+    }
+    else handleFilterRoutes();
+  }, [permissions, routesServices]);
+
   // states and functions
   const [sidebarVariant, setSidebarVariant] = useState("transparent");
   const [fixed, setFixed] = useState(true); // MANTENER NAVBAR FIJO
@@ -99,7 +121,7 @@ export default function Dashboard(props) {
   return (
     <ChakraProvider theme={theme} resetCss={false}>
       <Sidebar
-        routes={routes}
+        routes={routesServices}
         logoText={"MOROCHITA"}
         display='none'
         sidebarVariant={sidebarVariant}
@@ -115,8 +137,8 @@ export default function Dashboard(props) {
           <AdminNavbar
             onOpen={onOpen}
             logoText={"MOROCHITA"}
-            brandText={getActiveRoute(routes)}
-            secondary={getActiveNavbar(routes)}
+            brandText={getActiveRoute(routesServices)}
+            secondary={getActiveNavbar(routesServices)}
             fixed={fixed}
             {...rest}
           />
@@ -125,7 +147,7 @@ export default function Dashboard(props) {
           <PanelContent>
             <PanelContainer>
               <Switch>
-                {getRoutes(routes)}
+                {getRoutes(routesServices)}
                 <Redirect from='/admin' to='/admin/dashboard' />
               </Switch>
             </PanelContainer>

@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 // Chakra Icons
 import { BellIcon, SearchIcon } from "@chakra-ui/icons";
 // Chakra Imports
@@ -24,9 +25,9 @@ import { ProfileIcon, SettingsIcon } from "components/Icons/Icons";
 import { ItemContent } from "components/Menu/ItemContent";
 import { SidebarResponsive } from "components/Sidebar/Sidebar";
 import PropTypes from "prop-types";
-import React from "react";
 import { NavLink } from "react-router-dom";
 import routes from "routes.js";
+import { clearAllStorage } from "services/Auth/tokenService";
 
 export default function HeaderLinks(props) {
   const { variant, children, fixed, secondary, onOpen, ...rest } = props;
@@ -42,9 +43,30 @@ export default function HeaderLinks(props) {
     mainText = "white";
   }
 
-  const routesServices = routes.filter((route) => route.id < 0);
+  const [permissions, setPermissions] = useState(
+    JSON.parse(localStorage.getItem("permissions"))
+  );
+  const [routesServices, setRoutesServices] = useState([]);
+  
+  const handleFilterRoutes = () => {
+    const ids_modules = permissions.map((permission) => permission.id_module);
+    const filteredRoutes = routes.filter((route) => ids_modules.includes(route.id) || route.id <= 0);    
+    setRoutesServices(filteredRoutes);
+  };
 
-  const settingsRef = React.useRef();
+  useEffect(() => {
+    if (routesServices.length > 0) return;
+    setPermissions(JSON.parse(localStorage.getItem("permissions")));
+    if (!permissions) {
+      console.log("No permissions");
+      clearAllStorage();
+      return;
+    }
+    else handleFilterRoutes();
+  }, [permissions, routesServices]);
+
+  // const routesServices = routes.filter((route) => route.id < 0);
+  // const settingsRef = React.useRef();
   return (
     <Flex
       cursor='pointer'

@@ -15,7 +15,7 @@ export const LoginService = async (form) => {
     
     if (error)
         return { logged: false, msg: error.message};
-
+        
     const token = result?.token;
     if (!token)
         return { logged: false, msg: result?.detail?.mensaje};
@@ -30,6 +30,9 @@ export const saveToken = (token) => {
 export const saveUser = (user) => {
     local.set("user", user);
 }
+export const savePermissions = (permssions) => {
+    local.set("permissions", permssions);
+}
 export const removeUser = () => {
     local.remove("user");
 }
@@ -38,6 +41,9 @@ export const getToken = () => {
 }
 export const getUser = () => {
     return local.get("user");
+}
+export const getPermissions = () => {
+    return local.get("permissions");
 }
 export const isLogged = () => {
     return local.get("token") ? true : false;
