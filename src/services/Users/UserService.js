@@ -95,3 +95,21 @@ export const UserUpdateStatusService = async (id, is_active) => {
     else
         return { exito: false, msg: result?.data?.mensaje};
 }
+
+export const DashboardCardInfoService = async () => {
+    const [result, error] = await doRequest(
+        "/User/Dashboard",
+        "GET",
+        null,
+        getToken()
+    );
+    
+    if (error)
+        return;
+
+    const state = result?.state;
+    if(state === 1)
+        return { data: result?.data, msg: result?.data?.mensaje};
+    else
+        return { data: null, msg: result?.data?.mensaje};
+}

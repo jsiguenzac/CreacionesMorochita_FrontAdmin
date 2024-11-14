@@ -35,6 +35,7 @@ import BarChart from 'components/Charts/BarChart';
 import LineChart from 'components/Charts/LineChart';
 import IconBox from 'components/Icons/IconBox';
 // Icons
+import { MdInventory } from "react-icons/md";
 import { CartIcon, DocumentIcon, GlobeIcon, RocketIcon, StatsIcon, WalletIcon, PersonIcon } from 'components/Icons/Icons.js';
 import DashboardTableRow from 'components/Tables/DashboardTableRow';
 import TimelineRow from 'components/Tables/TimelineRow';
@@ -51,26 +52,80 @@ import {
 } from 'variables/charts';
 import { dashboardTableData, timelineData } from 'variables/general';
 import { getUser } from "services/Auth/tokenService";
+import { DashboardCardInfoService } from "services/Users/UserService";
+import { getModulesAndPermissions } from "../../utils/constants";
 
 export default function Dashboard() {
 	const navigate = useHistory().push;
+	const [loading, setLoading] = useState(false);
+	const [infoCardUser, setInfoCardUser] = useState(null);
+	const [infoCardInventory, setInfoCardInventory] = useState(null);
+	const [infoCardSales, setInfoCardSales] = useState(null);
+	const [infoGraphSalesStatus, setInfoGraphSalesStatus] = useState(null);
 	const [dataUser, setDataUser] = useState(null);
 	const user = getUser();
 	const goToProfile = () => {
 		navigate("/admin/profile");
-	}
+	}	
+	const goToSales = () => {
+		navigate("/admin/sales");
+	};
+	const goToInventory = () => {
+		navigate("/admin/inventory");
+	};
+	const goToUsers = () => {
+		navigate("/admin/users");
+	};
+	const goToReports = () => {
+		navigate("/admin/reports");
+	};
+	const moduleVentas = getModulesAndPermissions().find(module => module.id_module === 1);
+	const moduleInventario = getModulesAndPermissions().find(module => module.id_module === 2);
+	const moduleUsuarios = getModulesAndPermissions().find(module => module.id_module === 3);
+	const moduleReportes = getModulesAndPermissions().find(module => module.id_module === 5);
+
+	const handleCardInfo = async () => {
+		try {
+			setLoading(true);
+			const {data, msg} = await DashboardCardInfoService();
+			if (data) {
+				setInfoCardUser(data.users);
+				setInfoCardInventory(data.inventory);
+				setInfoCardSales(data.sales);
+				setInfoGraphSalesStatus(data.sales.sales_status);
+			}
+			else {
+				console.error(msg);
+			}
+		}
+		catch (error) {
+			console.error(error);
+		}
+		finally {
+			setLoading(false);
+		}
+	};
+
 	useEffect(() => {		
 		document.title = "Morochita | Admin";
 		if (user){
 			setDataUser(user);
+			handleCardInfo();
 		}
 	}, []);
 	return (
 		<Flex flexDirection='column' pt={{ base: '120px', md: '75px' }}>
+			{loading && <Flex justify='center' align='center' w='100%' h='100%'>
+				<CircularProgress isIndeterminate color='brand.200' />
+			</Flex>}
+			{!loading &&
 			<SimpleGrid columns={{ sm: 1, md: 2, xl: 4 }} spacing='24px'>
 				{/* MiniStatistics Card */}
-				<Card 
+				{moduleReportes &&
+				<Card
 					_hover={{ bg: 'brand.200', color: '#fff', transition: 'all .5s ease' }}
+					onClick={() => goToReports()}
+					cursor='pointer'
 				>
 					<CardBody>
 						<Flex flexDirection='row' align='center' justify='center' w='100%'>
@@ -80,9 +135,9 @@ export default function Dashboard() {
 								</StatLabel>
 								<Flex>
 									<StatNumber fontSize='lg' color='#fff'>
-										S/. 53,000
+										S/. {infoCardSales?.sales_today || 0}
 									</StatNumber>
-									<StatHelpText
+									{/* <StatHelpText
 										alignSelf='flex-end'
 										justifySelf='flex-end'
 										m='0px'
@@ -91,7 +146,7 @@ export default function Dashboard() {
 										ps='3px'
 										fontSize='md'>
 										+55%
-									</StatHelpText>
+									</StatHelpText> */}
 								</Flex>
 							</Stat>
 							<IconBox as='box' h={'45px'} w={'45px'} bg='brand.200'>
@@ -99,11 +154,14 @@ export default function Dashboard() {
 							</IconBox>
 						</Flex>
 					</CardBody>
-				</Card>
+				</Card>}
 				{/* MiniStatistics Card */}
+				{moduleInventario &&
 				<Card
 					minH='83px' 
 					_hover={{ bg: 'brand.200', color: '#fff', transition: 'all .5s ease' }}
+					onClick={() => goToInventory()}
+					cursor='pointer'
 				>
 					<CardBody>
 						<Flex flexDirection='row' align='center' justify='center' w='100%'>
@@ -113,29 +171,34 @@ export default function Dashboard() {
 								</StatLabel>
 								<Flex>
 									<StatNumber fontSize='lg' color='#fff'>
-										2,300
+										{infoCardInventory?.total_inventory || 0}
 									</StatNumber>
 									<StatHelpText
+										display={infoCardInventory?.porcent_inventory_news_month === 0 || !infoCardInventory ? 'none' : 'flex'}
 										alignSelf='flex-end'
 										justifySelf='flex-end'
 										m='0px'
-										color='green.400'
+										color={infoCardInventory?.flag_inventory_news_month ? 'red.500' : 'green.400'}
 										fontWeight='bold'
 										ps='3px'
 										fontSize='md'>
-										+5%
+										{infoCardInventory?.porcent_inventory_news_month > 0 ? '+' : '-'}
+										{infoCardInventory?.porcent_inventory_news_month || 0}%
 									</StatHelpText>
 								</Flex>
 							</Stat>
 							<IconBox as='box' h={'45px'} w={'45px'} bg='brand.200'>
-								<PersonIcon h={'24px'} w={'24px'} color='#fff' />
+								<MdInventory h={'24px'} w={'24px'} color='#fff' />
 							</IconBox>
 						</Flex>
 					</CardBody>
-				</Card>
+				</Card>}
 				{/* MiniStatistics Card */}
-				<Card 
+				{moduleUsuarios &&
+				<Card
 					_hover={{ bg: 'brand.200', color: '#fff', transition: 'all .5s ease' }}
+					onClick={() => goToUsers()}
+					cursor='pointer'
 				>
 					<CardBody>
 						<Flex flexDirection='row' align='center' justify='center' w='100%'>
@@ -145,17 +208,19 @@ export default function Dashboard() {
 								</StatLabel>
 								<Flex>
 									<StatNumber fontSize='lg' color='#fff'>
-										+3,020
+										{infoCardUser?.total_users || 0}
 									</StatNumber>
 									<StatHelpText
+										display={infoCardUser?.porcent_users_news_month === 0 || !infoCardUser ? 'none' : 'flex'}
 										alignSelf='flex-end'
 										justifySelf='flex-end'
 										m='0px'
-										color='red.500'
+										color={infoCardUser?.flag_porcent_users ? 'red.500' : 'green.400'}
 										fontWeight='bold'
 										ps='3px'
 										fontSize='md'>
-										-14%
+										{infoCardUser?.porcent_users_news_month > 0 ? '+' : '-'}
+										{infoCardUser?.porcent_users_news_month || 0}%
 									</StatHelpText>
 								</Flex>
 							</Stat>
@@ -165,10 +230,13 @@ export default function Dashboard() {
 							</IconBox>
 						</Flex>
 					</CardBody>
-				</Card>
+				</Card>}
 				{/* MiniStatistics Card */}
+				{moduleVentas &&
 				<Card
 					_hover={{ bg: 'brand.200', color: '#fff', transition: 'all .5s ease' }}
+					onClick={() => goToSales()}
+					cursor='pointer'
 				>
 					<CardBody>
 						<Flex flexDirection='row' align='center' justify='center' w='100%'>
@@ -178,17 +246,19 @@ export default function Dashboard() {
 								</StatLabel>
 								<Flex>
 									<StatNumber fontSize='lg' color='#fff' fontWeight='bold'>
-										S/. 173,000
+										S/. {infoCardSales?.sales_last_6_month || 0}
 									</StatNumber>
 									<StatHelpText
+										display={infoCardSales?.porcent_sales === 0 || !infoCardSales ? 'none' : 'flex'}
 										alignSelf='flex-end'
 										justifySelf='flex-end'
 										m='0px'
-										color='green.400'
+										color={infoCardSales?.flag_porcent_sales ? 'red.500' : 'green.400'}
 										fontWeight='bold'
 										ps='3px'
 										fontSize='md'>
-										+8%
+										{infoCardSales?.porcent_sales > 0 ? '+' : '-'}
+										{infoCardSales?.porcent_sales || 0}%
 									</StatHelpText>
 								</Flex>
 							</Stat>
@@ -197,8 +267,8 @@ export default function Dashboard() {
 							</IconBox>
 						</Flex>
 					</CardBody>
-				</Card>
-			</SimpleGrid>
+				</Card>}
+			</SimpleGrid>}
 			<Grid templateColumns={{ sm: '1fr', md: '1fr 1fr', '2xl': '2fr 1.2fr 1.5fr' }} my='26px' gap='18px'>
 				{/* Welcome Card */}
 				<Card
@@ -255,135 +325,117 @@ export default function Dashboard() {
 						</Flex>
 					</CardBody>
 				</Card>
-				{/* Satisfaction Rate */}
-				<Card gridArea={{ md: '2 / 1 / 3 / 2', '2xl': 'auto' }}>
-					<CardHeader mb='24px'>
-						<Flex direction='column'>
-							<Text color='#fff' fontSize='lg' fontWeight='bold' mb='4px'>
-								Satisfaction Rate
-							</Text>
-							<Text color='gray.400' fontSize='sm'>
-								From all projects
-							</Text>
-						</Flex>
-					</CardHeader>
-					<Flex direction='column' justify='center' align='center'>
-						<Box zIndex='-1'>
-							<CircularProgress
-								size={200}
-								value={80}
-								thickness={6}
-								color='#582CFF'
-								variant='vision'
-								rounded>
-								<CircularProgressLabel>
-									<IconBox mb='20px' mx='auto' bg='brand.200' borderRadius='50%' w='48px' h='48px'>
-										<Icon as={BiHappy} color='#fff' w='30px' h='30px' />
-									</IconBox>
-								</CircularProgressLabel>
-							</CircularProgress>
-						</Box>
-						{/* <Stack
-							direction='row'
-							spacing={{ sm: '42px', md: '68px' }}
-							justify='center'
-							maxW={{ sm: '270px', md: '300px', lg: '100%' }}
-							mx={{ sm: 'auto', md: '0px' }}
-							p='18px 22px'
-							bg='linear-gradient(126.97deg, rgb(6, 11, 40) 28.26%, rgba(10, 14, 35) 91.2%)'
-							borderRadius='20px'
-							position='absolute'
-							bottom='5%'>
-							<Text fontSize='xs' color='gray.400'>
-								0%
-							</Text>
-							<Flex direction='column' align='center' minW='80px'>
-								<Text color='#fff' fontSize='28px' fontWeight='bold'>
-									95%
-								</Text>
-								<Text fontSize='xs' color='gray.400'>
-									Based on likes
-								</Text>
-							</Flex>
-							<Text fontSize='xs' color='gray.400'>
-								100%
-							</Text>
-						</Stack> */}
-					</Flex>
-				</Card>
-				{/* Referral Tracking */}
-				<Card gridArea={{ md: '2 / 2 / 3 / 3', '2xl': 'auto' }}>
-					<Flex direction='column'>
-						<Flex justify='space-between' align='center' mb='40px'>
-							<Text color='#fff' fontSize='lg' fontWeight='bold'>
-								Referral Tracking
-							</Text>
-							<Button borderRadius='12px' w='38px' h='38px' bg='#22234B' _hover='none' _active='none'>
-								<Icon as={IoEllipsisHorizontal} color='#7551FF' />
-							</Button>
-						</Flex>
-						<Flex direction={{ sm: 'column', md: 'row' }}>
-							<Flex direction='column' me={{ md: '6px', lg: '52px' }} mb={{ sm: '16px', md: '0px' }}>
-								<Flex
-									direction='column'
-									p='22px'
-									pe={{ sm: '22e', md: '8px', lg: '22px' }}
-									minW={{ sm: '220px', md: '140px', lg: '220px' }}
-									bg='linear-gradient(126.97deg, #060C29 28.26%, rgba(4, 12, 48, 0.5) 91.2%)'
-									borderRadius='20px'
-									mb='20px'>
-									<Text color='gray.400' fontSize='sm' mb='4px'>
-										Invited
-									</Text>
-									<Text color='#fff' fontSize='lg' fontWeight='bold'>
-										145 people
-									</Text>
-								</Flex>
-								<Flex
-									direction='column'
-									p='22px'
-									pe={{ sm: '22px', md: '8px', lg: '22px' }}
-									minW={{ sm: '170px', md: '140px', lg: '170px' }}
-									bg='linear-gradient(126.97deg, #060C29 28.26%, rgba(4, 12, 48, 0.5) 91.2%)'
-									borderRadius='20px'>
-									<Text color='gray.400' fontSize='sm' mb='4px'>
-										Bonus
-									</Text>
-									<Text color='#fff' fontSize='lg' fontWeight='bold'>
-										1,465
-									</Text>
-								</Flex>
-							</Flex>
-							<Box mx={{ sm: 'auto', md: '0px' }}>
-								<CircularProgress
-									size={window.innerWidth >= 1024 ? 200 : window.innerWidth >= 768 ? 170 : 200}
-									value={70}
-									thickness={6}
-									color='#05CD99'
-									variant='vision'>
-									<CircularProgressLabel>
-										<Flex direction='column' justify='center' align='center'>
-											<Text color='gray.400' fontSize='sm'>
-												Safety
-											</Text>
-											<Text
-												color='#fff'
-												fontSize={{ md: '36px', lg: '50px' }}
-												fontWeight='bold'
-												mb='4px'>
-												9.3
-											</Text>
-											<Text color='gray.400' fontSize='sm'>
-												Total Score
-											</Text>
-										</Flex>
-									</CircularProgressLabel>
-								</CircularProgress>
-							</Box>
-						</Flex>
-					</Flex>
-				</Card>
 			</Grid>
+			{/* Seguimiento de ventas del mes actual */}
+			{loading && <Flex justify='center' align='center' w='100%' h='100%'>
+				<CircularProgress isIndeterminate color='brand.200' />
+			</Flex>}
+			{!loading &&
+			<Card justifyContent="center" width="100%" p="6">
+			<Flex direction="column">
+				<Flex justify="space-between" align="center" mb="40px">
+				<Text color="#fff" fontSize="lg" fontWeight="bold">
+					Seguimiento de ventas mensuales
+				</Text>
+				</Flex>
+
+				{/* Sección de estados */}
+				<Grid templateColumns={{ sm: '1fr', md: 'repeat(3, 1fr)' }} gap={6} mb={8}>
+				{/* Completadas */}
+				<Box bg="linear-gradient(126.97deg, #060C29 28.26%, rgba(4, 12, 48, 0.5) 91.2%)" borderRadius="20px" p="4">
+					<Stat color="#fff">
+					<StatLabel color="gray.400">Completadas</StatLabel>
+					<StatNumber fontSize="2xl">
+					S/.{infoGraphSalesStatus?.complete || 0}
+					</StatNumber>
+					</Stat>
+				</Box>
+
+				{/* Pendientes */}
+				<Box bg="linear-gradient(126.97deg, #060C29 28.26%, rgba(4, 12, 48, 0.5) 91.2%)" borderRadius="20px" p="4">
+					<Stat color="#fff">
+					<StatLabel color="gray.400">Pendientes</StatLabel>
+					<StatNumber fontSize="2xl">
+						S/.{infoGraphSalesStatus?.pending || 0}
+					</StatNumber>
+					</Stat>
+				</Box>
+
+				{/* Anuladas */}
+				<Box bg="linear-gradient(126.97deg, #060C29 28.26%, rgba(4, 12, 48, 0.5) 91.2%)" borderRadius="20px" p="4">
+					<Stat color="#fff">
+					<StatLabel color="gray.400">Anuladas</StatLabel>
+					<StatNumber fontSize="2xl">
+						S/.{infoGraphSalesStatus?.annul || 0}
+					</StatNumber>
+					</Stat>
+				</Box>
+				</Grid>
+
+				{/* Gráficas */}
+				<Grid templateColumns={{ sm: '1fr', md: 'repeat(3, 1fr)' }} gap={6}>
+				<Box textAlign="center">
+					<CircularProgress value={Number(infoGraphSalesStatus?.porcent_complete) || 0} size="120px" color="green.400" thickness="6px">
+					<CircularProgressLabel>
+						<Text 
+							color="#fff"
+							fontSize="12px"
+						>
+							Completadas
+						</Text>
+						<Text
+							color="green.400"
+							fontSize="lg"
+							fontWeight="bold"
+						>
+							{infoGraphSalesStatus?.porcent_complete || 0}%
+						</Text>
+					</CircularProgressLabel>
+					</CircularProgress>
+				</Box>
+
+				<Box textAlign="center">
+					<CircularProgress value={Number(infoGraphSalesStatus?.porcent_pending) || 0} size="120px" color="yellow.400" thickness="6px">
+					<CircularProgressLabel>
+						<Text
+							color="#fff"
+							fontSize="12px"
+						>
+							Pendientes
+						</Text>
+						<Text
+							fontSize="lg"
+							fontWeight="bold"
+							color="yellow.400"
+						>
+							{infoGraphSalesStatus?.porcent_pending || 0}%
+						</Text>
+					</CircularProgressLabel>
+					</CircularProgress>
+				</Box>
+
+				<Box textAlign="center">
+					<CircularProgress value={Number(infoGraphSalesStatus?.porcent_annul) || 0} size="120px" color="red.400" thickness="6px">
+					<CircularProgressLabel>
+						<Text
+							color="#fff"
+							fontSize="12px"
+						>
+							Anuladas
+						</Text>
+						<Text
+							fontSize="lg"
+							fontWeight="bold"
+							color="red.400"
+						>
+							{infoGraphSalesStatus?.porcent_annul || 0}%
+						</Text>
+					</CircularProgressLabel>
+					</CircularProgress>
+				</Box>
+				</Grid>
+			</Flex>
+			</Card>}
 			
 			<Grid templateColumns={{ sm: '1fr', md: '1fr 1fr', lg: '2fr 1fr' }} gap='24px'>
 				{/* Projects 
