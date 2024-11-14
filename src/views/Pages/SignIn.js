@@ -18,13 +18,14 @@ import {
   useDisclosure,
   InputGroup,
   InputRightElement,
-  Icon
+  Icon,
+  useToast
 } from "@chakra-ui/react";
 
 // Assets
 import signinImage from "assets/img/fondoHome.png";
 import imgHome from 'assets/img/fondoHome3.jpg';
-import { LoginService, savePermissions, clearAllStorage } from "../../services/Auth/tokenService";
+import { LoginService, RecoverAccessService, savePermissions, clearAllStorage } from "../../services/Auth/tokenService";
 import { PermissionsListService } from "../../services/Auth/PermissionsService";
 
 // Custom Components
@@ -33,10 +34,13 @@ import GradientBorder from "components/GradientBorder/GradientBorder";
 import DotSpin from "components/utils/BounciLoader";
 import { CustomModal } from "components/Modal/ModalMessage";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import ModalRecoverAccess from "../components/login/ModalRecoverAccess";
 
 function signin() {
+  const toast = useToast();
   const navigate = useHistory().push;
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
   const [err, setErr] = useState("");
   const [form, setForm] = useState({
     email: "",
@@ -56,6 +60,7 @@ function signin() {
 
   const handleSubmit = async () => {
     setLoading(true);
+    setMessage("Iniciando Sesión...");
     try {
       setErr("");
       const {logged, msg} = await LoginService(form);
@@ -78,11 +83,12 @@ function signin() {
         setErr("La contraseña es incorrecta");
       handleShowModal();
     } catch (error) {
-      console.error("Error during auth/signin:", error);
+      console.error("Error auth/signin:", error);
       clearAllStorage();
-      return;
+      setErr("Ocurrió un error inesperado al intentar iniciar sesión. Vuelve a intentarlo más tarde");
     } finally {
       setLoading(false);
+      setMessage("");
     }
   };  
   const { email, password, remind } = form;
@@ -97,17 +103,64 @@ function signin() {
   }, []);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isOpenRecover, onOpen: onOpenRecover, onClose: onCloseRecover } = useDisclosure();
 
   const handleShowModal = () => {
       onOpen();
   };
 
-  const [showPassword, setShowPassword] = useState(false); // Estado para controlar visibilidad
+  const [showPassword, setShowPassword] = useState(false);
 
   const toggleShowPassword = () => {
       setShowPassword(!showPassword); // Alternar entre mostrar y ocultar contraseña
   };
 
+  const handleRecoverPass = async (email) => {
+    setLoading(true);
+    setMessage("Enviando Correo...");
+    try {
+      const { exito, msg } = await RecoverAccessService(email);
+      console.log("auth/recover Successful:", exito, msg);
+      if (exito) {
+        toast({
+          title: "Correo enviado",
+          description: "Se ha enviado un correo con las instrucciones para recuperar tu contraseña",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        onCloseRecover();
+      }
+      else if (msg === "CORREO_INVALIDO") {
+        toast({
+          title: "Ups!",
+          description: "El correo ingresado no es válido",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
+      }
+      else if (msg === "USUARIO_NO_ENCONTRADO") {
+        toast({
+          title: "Usuario no encontrado",
+          description: "El correo ingresado no está registrado en el sistema o fue inactivado.\nContacta al administrador del sistema",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+        return;
+      }
+    } catch (error) {
+      console.error("Error auth/recover:", error);
+      setErr("Ocurrió un error inesperado al intentar recuperar tu contraseña. Vuelve a intentarlo más tarde");
+    }
+    finally {
+      setLoading(false);
+      setMessage("");
+    }
+  };
+  
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
@@ -305,7 +358,12 @@ function signin() {
               mt='0px'>
               <Text color={textColor} fontWeight='medium'>
                 ¿No puedes ingresar?
-                <Link color={titleColor} as='span' ms='5px' fontWeight='bold'>
+                <Link
+                  color={titleColor}
+                  as='span' ms='5px'
+                  fontWeight='bold'
+                  onClick={onOpenRecover}
+                >
                   Haz clic aquí
                 </Link>
               </Text>
@@ -360,13 +418,18 @@ function signin() {
           </Box>
         </Box>
       </Flex>
+      <ModalRecoverAccess
+        isOpen={isOpenRecover}
+        onClose={onCloseRecover}
+        onSubmit={(email) => {handleRecoverPass(email)}}
+      />
       <CustomModal
           header="Upss!"
           message={err || "Credenciales Incorrectas"}
           isOpen={isOpen}
           onClose={onClose}
       />
-      {loading && <DotSpin message="Iniciando Sesión..." />}
+      {loading && <DotSpin message={message} />}
     </Flex>
   );
 }

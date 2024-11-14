@@ -24,6 +24,27 @@ export const LoginService = async (form) => {
     saveUser(result?.user);
     return { logged: true, msg: null};
 }
+
+export const RecoverAccessService = async (form) => {
+    const body = {
+        email: form.email
+    };
+    const [result, error] = await doRequest(
+        "/Login/RecoverPassword",
+        "POST",
+        body
+    );
+    
+    if (error)
+        return { exito: false, msg: error.message};
+    
+    const state = result?.state;
+    if(state === 1)
+        return { exito: result?.data?.exito, msg: result?.data?.mensaje};
+    else
+        return { exito: false, msg: result?.data?.mensaje};
+}
+
 export const saveToken = (token) => {
     local.set("token", token);
 }
