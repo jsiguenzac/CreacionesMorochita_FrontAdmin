@@ -79,10 +79,10 @@ export default function Dashboard() {
 	const goToReports = () => {
 		navigate("/admin/reports");
 	};
-	const moduleVentas = getModulesAndPermissions().find(module => module.id_module === 1);
-	const moduleInventario = getModulesAndPermissions().find(module => module.id_module === 2);
-	const moduleUsuarios = getModulesAndPermissions().find(module => module.id_module === 3);
-	const moduleReportes = getModulesAndPermissions().find(module => module.id_module === 5);
+	const moduleVentas = getModulesAndPermissions()?.find(module => module.id_module === 1);
+	const moduleInventario = getModulesAndPermissions()?.find(module => module.id_module === 2);
+	const moduleUsuarios = getModulesAndPermissions()?.find(module => module.id_module === 3);
+	const moduleReportes = getModulesAndPermissions()?.find(module => module.id_module === 5);
 
 	const handleCardInfo = async () => {
 		try {
@@ -106,7 +106,7 @@ export default function Dashboard() {
 		}
 	};
 
-	useEffect(() => {		
+	useEffect(() => {
 		document.title = "Morochita | Admin";
 		if (user){
 			setDataUser(user);

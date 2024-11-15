@@ -1,5 +1,11 @@
 import { API_URL } from "../config/deployMode";
 
+export const handleReloadErr = () => {
+  localStorage.clear();
+  sessionStorage.clear();
+  window.location.href = window.location.href;
+};
+
 const doRequest = async (endpoint, method = "GET", data = null, token = null, alternativeAPIUrl = null) => {
   // Construir la URL base
   const url = `${alternativeAPIUrl || API_URL}${endpoint}`;
@@ -24,9 +30,7 @@ const doRequest = async (endpoint, method = "GET", data = null, token = null, al
 
     // Verificar si la respuesta no está autorizada (401)
     if (response.status === 401) {
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.reload();
+      handleReloadErr();
       return [null, new Error("No autorizado")];
     }
 
@@ -34,6 +38,8 @@ const doRequest = async (endpoint, method = "GET", data = null, token = null, al
     const result = await response.json();
     return [result, null];
   } catch (error) {
+    console.error("Err_Req", error);
+    handleReloadErr();
     // Devolver error en caso de fallo
     return [null, error];
   }

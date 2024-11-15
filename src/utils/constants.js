@@ -1,11 +1,10 @@
 import routes from '../routes';
-import { clearAllStorage } from '../services/Auth/tokenService';
+import { handleReloadErr } from '../services/helpers';
 
 export const getModulesAndPermissions = () => {
     const permissions = JSON.parse(localStorage.getItem("permissions"));
     if (!permissions) {
-        clearAllStorage();
-        window.reload();
+        handleReloadErr();
     }
     return permissions;
 };

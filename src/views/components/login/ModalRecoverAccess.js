@@ -106,8 +106,7 @@ const ModalRecoverAccess = ({ isOpen, onClose, onSubmit }) => {
             </Button>
             </ModalFooter>
         </ModalContent>
-        </Modal>
-
+    </Modal>
   );
 };
 
