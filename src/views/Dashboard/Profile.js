@@ -40,7 +40,7 @@ import {
 	lineChartOptionsProfile2
 } from 'variables/charts';
 import { CustomModal } from 'components/Modal/ModalMessage';
-import { DetailUser } from 'services/Profile/DetailUser';
+import { DetailUser } from 'services/Profile/DetailUserService';
 import DotSpin from 'components/utils/BounciLoader';
 
 import { EditProfileButton } from '../components/profile/EditProfileButton';

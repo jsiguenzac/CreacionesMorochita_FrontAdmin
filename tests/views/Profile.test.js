@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import Profile from '../../src/views/Dashboard/Profile';
 import * as tokenService from 'services/Auth/tokenService';
-import { DetailUser } from 'services/Profile/DetailUser';
+import { DetailUser } from 'services/Profile/DetailUserService';
 import '@testing-library/jest-dom';
 
 jest.mock('../../src/services/Auth/tokenService', () => ({
@@ -18,7 +18,7 @@ jest.mock('../../src/services/Auth/tokenService', () => ({
     isLogged: jest.fn(() => true),
 }));
 
-jest.mock('../../src/services/Profile/DetailUser', () => ({
+jest.mock('../../src/services/Profile/DetailUserService', () => ({
     DetailUser: jest.fn(),
   }));
 

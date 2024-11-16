@@ -11,7 +11,6 @@ export const DetailUser = async (id_user) => {
     
     if (error)
         return;
-
     const state = result?.state;
     if (state === 0)
         return { data: null, msg: result?.data?.mensaje};
