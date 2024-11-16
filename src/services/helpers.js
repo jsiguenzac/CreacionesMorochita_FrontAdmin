@@ -3,10 +3,17 @@ import { API_URL } from "../config/deployMode";
 export const handleReloadErr = () => {
   localStorage.clear();
   sessionStorage.clear();
-  window.location.href = window.location.href;
+  window.location.reload();
 };
 
-const doRequest = async (endpoint, method = "GET", data = null, token = null, alternativeAPIUrl = null) => {
+const doRequest = async (
+  endpoint,
+  method = "GET",
+  data = null,
+  token = null,
+  isBlob = false,
+  alternativeAPIUrl = null
+) => {
   // Construir la URL base
   const url = `${alternativeAPIUrl || API_URL}${endpoint}`;
   
@@ -34,13 +41,43 @@ const doRequest = async (endpoint, method = "GET", data = null, token = null, al
       return [null, new Error("No autorizado")];
     }
 
-    // Parsear la respuesta JSON si está disponible
-    const result = await response.json();
-    return [result, null];
+    if (isBlob) {
+      const contentType = response.headers.get("Content-Type");
+      if (contentType && contentType.includes("application/json")) {
+        // Intentar obtener respuesta JSON si es un error
+        const result = await response.json();
+        if (result?.state === 0) {
+          return [result, null];
+        }
+      }
+      /* const contentDisposition = response.headers.get("Content-Disposition");]
+      const filename = contentDisposition
+        ? contentDisposition.split("filename=")[1].trim()
+        : "archivo_descargado"; */
+      // Procesar la respuesta como Blob para la descarga
+      const blob = await response.blob();
+      // Verificar si el archivo es un Blob válido (opcional)
+      if (!blob || blob.size === 0) {
+        return [null, new Error("Error al descargar el archivo. El contenido está vacío.")];
+      }
+      const now = new Date();
+      const timestamp = `${now.getFullYear()}-${(now.getMonth() + 1)
+        .toString()
+        .padStart(2, "0")}-${now.getDate().toString().padStart(2, "0")}_${now
+        .getHours()
+        .toString()
+        .padStart(2, "0")}-${now.getMinutes()
+        .toString()
+        .padStart(2, "0")}-${now.getSeconds().toString().padStart(2, "0")}`;
+      const filename = `Reporte_Ventas_${timestamp}.xlsx`;
+      return [{ blob, filename }, null];
+    } else {
+      // Manejar respuesta JSON
+      const result = await response.json();
+      return [result, null];
+    }
   } catch (error) {
     console.error("Err_Req", error);
-    handleReloadErr();
-    // Devolver error en caso de fallo
     return [null, error];
   }
 };

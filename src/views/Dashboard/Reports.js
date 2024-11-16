@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-
 // Chakra imports
 import {
   Flex,
@@ -26,6 +25,7 @@ import {
   Tr,
   useToast,
   useDisclosure,
+  CircularProgress,
 } from "@chakra-ui/react";
 
 import BarChart from 'components/Charts/BarChart';
@@ -44,9 +44,11 @@ import TablesTableRow from "components/Tables/TablesTableRow";
 import ModalCLientForm from "../components/client/ModalClientForm";
 import DotSpin from "components/utils/BounciLoader";
 import { CustomModal } from "components/Modal/ModalMessage";
+import { dateToTimestamp } from "components/utils/Methods";
 
 // Data
-import { UserListService, UserUpdateService, UserCreateService } from "services/Users/UserService";
+import { UserListService } from "services/Users/UserService";
+import { ReportExportService } from "services/Sales/ReportsSalesServices";
 import {
 	barChartDataDashboard,
 	barChartOptionsDashboard,
@@ -58,16 +60,10 @@ import { AiFillCheckCircle } from "react-icons/ai";
 import { CartIcon, DocumentIcon, GlobeIcon, RocketIcon, StatsIcon, WalletIcon, PersonIcon } from 'components/Icons/Icons.js';
 
 function Reports() {
-  const [name, setName] = useState("");
-  const [page, setPage] = useState(1);
-  const [applyFilters, setApplyFilters] = useState(false);
   const [msg, setMsg] = useState("");
   const [err, setErr] = useState("");
   const [sellers, setSellers] = useState([]);
-  const [listReport, setListReport] = useState([]);
-  const [idSeller, setIdSeller] = useState("");
-  const [reportPerPage, setReportPerPage] = useState(10);
-  const [totalReport, setTotalReport] = useState(0);
+  const [idSeller, setIdSeller] = useState(0);
   const [filters, setFilters] = useState({
     seller: "",
     dateInit: "",
@@ -83,7 +79,6 @@ function Reports() {
   const today = now.toISOString().split("T")[0];
   const yesterday = new Date(now.setDate(now.getDate() - 1)).toISOString().split("T")[0];
 
-
   const handleSellerList = async () => {
     const form = {
       page: 1,
@@ -92,7 +87,7 @@ function Reports() {
       dateCreation: -1,
     };
     setLoading(true);
-    setMsg("Cargando vendedores...");
+    setMsg("Obteniendo vendedores...");
     try {
       const { data, msg } = await UserListService(form);
       if (data) {
@@ -122,42 +117,75 @@ function Reports() {
       [name]: value,
     });
   };
-  
-  const handleIncrementPage = () => {
-    setPage(page + 1);
-    setApplyFilters(true);
-  };
-  const handleDecrementPage = () => {
-    if (page === 1) return;
-    setPage(page - 1);
-    setApplyFilters(true);
-  };
 
-  const handleApplyFilters = async () => {
-    // Lógica para aplicar los filtros
-    const form = {
-      page: page,
-      name: name,
-      idRol: 5,
-      dateCreation: -1,
-    };
-    setLoading(true);
-    setMsg("Aplicando filtros...");
+  const handleDownloadReport = async () => {
     try {
-      const { data, msg } = await UserListService(form);
-      if (data) {
-        console.log("Clientes:", data);
+      const tsInit = dateToTimestamp(filters.dateInit);
+      const tsEnd = dateToTimestamp(filters.dateEnd);
+      const form = {
+        seller: idSeller,
+        dateInit: tsInit,
+        dateEnd: tsEnd,
+      };
+      setLoading(true);
+      setMsg("Descargando reporte...");
+      const { exito, msg } = await ReportExportService(form);
+      if (exito) {
+        toast({
+          title: "Reporte descargado",
+          description: "El reporte de ventas se descargó correctamente",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+      else if (msg === "FECHA_FIN_MENOR") {
+        toast({
+          title: "Ups!",
+          description: "La fecha de fin debe ser mayor a la fecha de inicio",
+          status: "warning",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+      else if (msg === "NO_HAY_VENTAS") {
+        toast({
+          title: "Ups!",
+          description: "No se encontraron ventas para exportar",
+          status: "warning",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+      else if (msg === "ERROR_EXPORTAR_EXCEL") {
+        toast({
+          title: "¡Oh no!",
+          description: "Ocurrió un error al descargar el reporte de ventas.\nIntentelo de nuevo, más tarde",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
       }
       else {
-        console.log("Error al obtener el reporte:", msg);
-        setErr("Error al obtener el reporte");
-        onOpenErr();
+        console.log("ErrExport", msg);
+        toast({
+          title: "¡Oh no!",
+          description: "Ocurrió un error al descargar el reporte de ventas.\nIntentelo de nuevo, más tarde",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
       }
     }
     catch (error) {
-      console.error("Error al obtener el reporte:", error);
-      setErr("Error inesperado al obtener el reporte");
-      onOpenErr();
+      console.error("Error al descargar el reporte:", error);
+      toast({
+        title: "¡Oh no!",
+        description: "Ocurrió un error inesperado al exportar el reporte de ventas.\nContacte al desarrollador",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
     finally {
       setLoading(false);
@@ -166,26 +194,16 @@ function Reports() {
   };
 
   const handleClearFilters = () => {
-    setName("");
-    setPage(1);
-    setApplyFilters(true);
+    setIdSeller(0);
     setFilters({
       seller: "",
       dateInit: "",
       dateEnd: "",
     });
   };
-
-  useEffect(() => {
-    if (applyFilters) {
-      handleApplyFilters();
-      setApplyFilters(false);
-    }
-  }, [applyFilters]);
   
   useEffect(() => {
     handleSellerList();
-    handleApplyFilters();
 		if (onCloseErr) {
 			setErr("");
 		}
@@ -198,7 +216,11 @@ function Reports() {
         <CardHeader p="6px 0px 22px 0px">
           <Flex direction={{ base: "column", md: "row" }} gap="20px">
             <Text fontSize="lg" color="#fff" fontWeight="bold">
-              Filtros de Búsqueda
+              Generación de Reportes de Ventas
+              <br />
+              <Text fontSize="sm" color="gray.400" fontWeight="medium">
+                Filtra las ventas según un rango de fechas y/o un vendedor específico.
+              </Text>
             </Text>
           </Flex>
         </CardHeader>
@@ -219,6 +241,7 @@ function Reports() {
                     width={{ base: "100%", md: "100%" }}
                     border="1px solid #4B5563"
                     as={Button}
+                    name="seller"
                     rightIcon={<ChevronDownIcon color={filters.seller ? "white" : "gray.200"} />}
                     bg="none"
                     color={!filters.seller ? "gray.500" : "white"}
@@ -296,59 +319,29 @@ function Reports() {
                 _hover={{ bg: "brand.300" }}
                 bg="brand.200"
                 textColor="white"
-                onClick={handleApplyFilters}
+                onClick={handleDownloadReport}
                 width={{ base: "100%", md: "auto" }}
               >
-                Aplicar
+                <Icon as={DownloadIcon} w="20px" h="20px" me="5px" />
+                <Text fontSize="sm">
+                  Generar Reporte
+                </Text>
               </Button>
               <Button
                 _hover={{ bg: "white" }}
                 bg="gray.300"
-                disabled={Object.values(filters).every((filter) => filter === "") && page === 1}
+                disabled={Object.values(filters).every((filter) => filter === "")}
                 onClick={handleClearFilters}
                 width={{ base: "100%", md: "auto" }}
               >
                 Limpiar
               </Button>
-              <Button
-                _hover={{ bg: page === 1 ? "gray.400" : "purple.500" }}
-                bg={page === 1 ? "gray.300" : "brand.200"}
-                disabled={page === 1}
-                onClick={handleDecrementPage}
-                width={{ base: "100%", md: "auto" }}
-                textColor={page === 1 ? "gray.500" : "white"}
-              >
-                {'<'}
-              </Button>
-              <Button
-                _hover={{ bg: (page * reportPerPage) >= totalReport ? "gray.400" : "purple.500" }}
-                bg={(page * reportPerPage) >= totalReport ? "gray.300" : "brand.200"}
-                disabled={(page * reportPerPage) >= totalReport}
-                onClick={handleIncrementPage}
-                width={{ base: "100%", md: "auto" }}
-                textColor={(page * reportPerPage) >= totalReport ? "gray.500" : "white"}
-              >
-                {'>'}
-              </Button>
-              <Button
-                _hover={{ bg: "purple.500" }}
-                bg={(page * reportPerPage) >= totalReport ? "gray.300" : "brand.200"}
-                disabled={(page * reportPerPage) >= totalReport}
-                onClick={handleIncrementPage}
-                width={{ base: "100%", md: "auto" }}
-                textColor={(page * reportPerPage) >= totalReport ? "gray.500" : "white"}
-              >
-                <Icon as={DownloadIcon} w="20px" h="20px" me="5px" />
-                <Text fontSize="sm">
-                  Exportar
-                </Text>
-              </Button>
             </Flex>
           </Flex>
         </CardBody>
       </Card>
-      {/* Clients Table */}
-      <Card my='22px' overflowX={{ sm: "scroll", xl: "hidden" }} pb='0px'>
+      {/* Report Table */}
+      {/* <Card my='22px' overflowX={{ sm: "scroll", xl: "hidden" }} pb='0px'>
         <CardBody>
           <Table variant='simple' color='#fff'>
             <Thead>
@@ -421,10 +414,10 @@ function Reports() {
             </Tbody>
           </Table>
         </CardBody>        
-      </Card>
+      </Card> */}
       
       {/* Graficas */}
-      <Flex 
+      {/* <Flex 
         direction='row'
         justifyContent='center'
         alignItems='center'
@@ -432,147 +425,38 @@ function Reports() {
         marginBottom='20px'
       >
         <Text fontSize='lg' color='#fff' fontWeight='bold'>
-          Gráficas
+          Gráfica de Ventas
         </Text>
-      </Flex>
-      <Grid
-				templateColumns={{ sm: '1fr', lg: '1.7fr 1.3fr' }}
-				maxW={{ sm: '100%', md: '100%' }}
-				gap='24px'
-				mb='24px'
-      >
-				{/* Sales Overview */}
-				<Card p='28px 0px 0px 0px'>
-					<CardHeader mb='20px' ps='22px'>
-						<Flex direction='column' alignSelf='flex-start'>
-							<Text fontSize='lg' color='#fff' fontWeight='bold' mb='6px'>
-								Ventas del año
-							</Text>
-							<Text fontSize='md' fontWeight='medium' color='gray.400'>
-								<Text as='span' color='green.400' fontWeight='bold'>
-									(+5%) more
-								</Text>{' '}
-								en {1900 + new Date().getYear()}
-							</Text>
-						</Flex>
-					</CardHeader>
-					<Box w='100%' minH={{ sm: '300px' }}>
-						<LineChart
-							lineChartData={lineChartDataDashboard}
-							lineChartOptions={lineChartOptionsDashboard}
-						/>
-					</Box>
-				</Card>
-				{/* Active Users */}
-				<Card p='16px'>
-					<CardBody>
-						<Flex direction='column' w='100%'>
-							<Box
-								bg='linear-gradient(126.97deg, #060C29 28.26%, rgba(4, 12, 48, 0.5) 91.2%)'
-								borderRadius='20px'
-								display={{ sm: 'flex', md: 'block' }}
-								justify={{ sm: 'center', md: 'flex-start' }}
-								align={{ sm: 'center', md: 'flex-start' }}
-								minH={{ sm: '180px', md: '220px' }}
-								p={{ sm: '0px', md: '22px' }}>
-								<BarChart
-									barChartOptions={barChartOptionsDashboard}
-									barChartData={barChartDataDashboard}
-								/>
-							</Box>
-							<Flex direction='column' mt='24px' mb='36px' alignSelf='flex-start'>
-								<Text fontSize='lg' color='#fff' fontWeight='bold' mb='6px'>
-									Clientes activos
-								</Text>
-								<Text fontSize='md' fontWeight='medium' color='gray.400'>
-									<Text as='span' color='green.400' fontWeight='bold'>
-										(+23%)
-									</Text>{' '}
-									en la última semana
-								</Text>
-							</Flex>
-							<SimpleGrid gap={{ sm: '12px' }} columns={4}>
-								<Flex direction='column'>
-									<Flex alignItems='center'>
-										<IconBox as='box' h={'30px'} w={'30px'} bg='brand.200' me='6px'>
-											<WalletIcon h={'15px'} w={'15px'} color='#fff' />
-										</IconBox>
-										<Text fontSize='sm' color='gray.400'>
-											Users
-										</Text>
-									</Flex>
-									<Text
-										fontSize={{ sm: 'md', lg: 'lg' }}
-										color='#fff'
-										fontWeight='bold'
-										mb='6px'
-										my='6px'>
-										32,984
-									</Text>
-									<Progress colorScheme='brand' bg='#2D2E5F' borderRadius='30px' h='5px' value={20} />
-								</Flex>
-								<Flex direction='column'>
-									<Flex alignItems='center'>
-										<IconBox as='box' h={'30px'} w={'30px'} bg='brand.200' me='6px'>
-											<RocketIcon h={'15px'} w={'15px'} color='#fff' />
-										</IconBox>
-										<Text fontSize='sm' color='gray.400'>
-											Clicks
-										</Text>
-									</Flex>
-									<Text
-										fontSize={{ sm: 'md', lg: 'lg' }}
-										color='#fff'
-										fontWeight='bold'
-										mb='6px'
-										my='6px'>
-										2.42m
-									</Text>
-									<Progress colorScheme='brand' bg='#2D2E5F' borderRadius='30px' h='5px' value={90} />
-								</Flex>
-								<Flex direction='column'>
-									<Flex alignItems='center'>
-										<IconBox as='box' h={'30px'} w={'30px'} bg='brand.200' me='6px'>
-											<CartIcon h={'15px'} w={'15px'} color='#fff' />
-										</IconBox>
-										<Text fontSize='sm' color='gray.400'>
-											Sales
-										</Text>
-									</Flex>
-									<Text
-										fontSize={{ sm: 'md', lg: 'lg' }}
-										color='#fff'
-										fontWeight='bold'
-										mb='6px'
-										my='6px'>
-										2,400$
-									</Text>
-									<Progress colorScheme='brand' bg='#2D2E5F' borderRadius='30px' h='5px' value={30} />
-								</Flex>
-								<Flex direction='column'>
-									<Flex alignItems='center'>
-										<IconBox as='box' h={'30px'} w={'30px'} bg='brand.200' me='6px'>
-											<StatsIcon h={'15px'} w={'15px'} color='#fff' />
-										</IconBox>
-										<Text fontSize='sm' color='gray.400'>
-											Items
-										</Text>
-									</Flex>
-									<Text
-										fontSize={{ sm: 'md', lg: 'lg' }}
-										color='#fff'
-										fontWeight='bold'
-										mb='6px'
-										my='6px'>
-										320
-									</Text>
-									<Progress colorScheme='brand' bg='#2D2E5F' borderRadius='30px' h='5px' value={50} />
-								</Flex>
-							</SimpleGrid>
-						</Flex>
-					</CardBody>
-				</Card>
-			</Grid>
+      </Flex> */}
+      {/* Sales Overview */}
+      {loading && <Flex justify='center' align='center' w='100%' h='100%'>
+        <CircularProgress isIndeterminate color='brand.200' />
+      </Flex>}
+      {!loading && <Card justifyContent="center" width="100%" p="6">
+        <CardHeader mb='20px' ps='22px'>
+          <Flex direction='column' alignSelf='flex-start'>
+            <Text fontSize='lg' color='#fff' fontWeight='bold' mb='6px'>
+              Ventas del año
+            </Text>
+            <Text fontSize='md' fontWeight='medium' color='gray.400'>
+              <Text 
+                as='span'
+                color='green.400'
+                fontWeight='bold'
+              >
+                (+5%) más
+              </Text>{' '}
+              en {1900 + new Date().getYear()}
+            </Text>
+          </Flex>
+        </CardHeader>
+        <Box w='100%' minH={{ sm: '300px' }}>
+          <LineChart
+            lineChartData={lineChartDataDashboard}
+            lineChartOptions={lineChartOptionsDashboard}
+          />
+        </Box>
+      </Card>}
       <CustomModal
 				header="Upss!"
 				message={err}

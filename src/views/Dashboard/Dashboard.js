@@ -436,7 +436,6 @@ export default function Dashboard() {
 				</Grid>
 			</Flex>
 			</Card>}
-			
 			<Grid templateColumns={{ sm: '1fr', md: '1fr 1fr', lg: '2fr 1fr' }} gap='24px'>
 				{/* Projects 
 				<Card p='16px' overflowX={{ sm: 'scroll', xl: 'hidden' }}>
