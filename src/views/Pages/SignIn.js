@@ -395,14 +395,14 @@ function signin() {
             flexDirection='column'
             justifyContent='center'
             alignItems='center'>
-            <Text
+            {/* <Text
               textAlign='center'
               color='white'
               letterSpacing='8px'
               fontSize='20px'
               fontWeight='500'>
               TIENDA DE ROPA:
-            </Text>
+            </Text> */}
             <Text
               textAlign='center'
               color='transparent'

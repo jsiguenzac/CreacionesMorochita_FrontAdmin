@@ -97,7 +97,6 @@ export default function Profile() {
 		setLoading(true);
 		try {
 			const { data, msg } = await UserProfileService();
-			console.log("data: ", data);
 			if (data) {
 				setDataInfo(data);
 			} else {

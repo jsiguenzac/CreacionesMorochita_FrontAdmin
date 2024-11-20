@@ -11,7 +11,7 @@ export default function Footer(props) {
       }}
       alignItems={{
         base: "center",
-        xl: "start",
+        xl: "start"
       }}
       justifyContent='space-between'
       px='30px'
@@ -45,18 +45,14 @@ export default function Footer(props) {
           : " for a better web"} */}
       </Text>
 
-
-      <List display='flex'>
+      {/* <List display='flex'>
         <ListItem
           me={{
             base: "20px",
             md: "44px",
           }}>
           <Link color='white' fontSize='sm' href='https://www.simmmple.com'>
-            {/* {document.documentElement.dir === "rtl"
-              ? "توقيت الإبداعية"
-              : "Por Cambiar"} */}
-              Por cambiar
+            Por cambiar
           </Link>
         </ListItem>
         <ListItem
@@ -65,7 +61,6 @@ export default function Footer(props) {
             md: "44px",
           }}>
           <Link color='white' fontSize='sm' href='https://www.creative-tim.com'>
-            {/* {document.documentElement.dir === "rtl" ? "سيممبل" : "Creative Tim"} */}
             Por cambiar
           </Link>
         </ListItem>
@@ -78,7 +73,6 @@ export default function Footer(props) {
             color='white'
             fontSize='sm'
             href='https://creative-tim.com/blog'>
-            {/* {document.documentElement.dir === "rtl" ? "مدونة" : "Blog"} */}
             Por cambiar
           </Link>
         </ListItem>
@@ -87,11 +81,10 @@ export default function Footer(props) {
             color='white'
             fontSize='sm'
             href='https://www.creative-tim.com/license'>
-            {/* {document.documentElement.dir === "rtl" ? "رخصة" : "License"} */}
             Por cambiar
           </Link>
         </ListItem>
-      </List>
+      </List> */}
     </Flex>
   );
 }
