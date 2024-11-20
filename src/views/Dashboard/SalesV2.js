@@ -280,6 +280,19 @@ function Sales() {
         isClosable: true,
       });
     }
+    else if (
+      msg.includes("no fue encontrado en el inventario") ||
+      msg.includes("No hay suficiente stock") ||
+      msg.includes("una venta anulada")
+    ){
+      toast({
+        title: "¡Error!",
+        description: msg,
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
     else if (msg === "PRODUCTO_NO_ENCONTRADO"){
       data.products.find(p => p.id === prod).name;
       toast({
@@ -299,6 +312,7 @@ function Sales() {
         isClosable: true,
       });
     }
+    if(!exito) return;
   };
 
   const handleUpdateSaleService = async (data) => {
@@ -340,7 +354,8 @@ function Sales() {
         duration: 3000,
         isClosable: true,
       });
-    }
+    }    
+    if(!exito) return;
   };
 
   const handleGestionarVenta = async (sale) => {

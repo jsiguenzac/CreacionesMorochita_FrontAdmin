@@ -448,7 +448,9 @@ const ModalSalesForm = ({ isOpen, onClose, onSubmit, sale, detailsProd, payment,
                 width="100%"
                 minWidth="unset"
               >
-                {status.map((c) => (
+                {status
+                  .filter((p) => p.id !== 3 || sale)
+                  .map((c) => (
                   <MenuItem
                     _hover={{ bg: "brand.100" }}
                     key={c.id}
