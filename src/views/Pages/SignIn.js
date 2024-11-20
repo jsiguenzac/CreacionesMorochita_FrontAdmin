@@ -170,7 +170,7 @@ function signin() {
   }, []);
 
   return (
-    <Flex position='relative'>
+    <Flex position='relative'>      
       <Flex
         minH='100vh'
         h={{ base: "100vh", lg: "fit-content" }}
@@ -183,27 +183,23 @@ function signin() {
         
         {/* <Logo Mobile /> */}
         {isMobile && (
-          <div style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              position: "absolute",
-              top: "50px",
-              left: 0,
-              right: 0,
-              textAlign: "center"
-            }}
+          <Flex 
+            position='absolute'
+            top='40px'
+            w='100%'
+            justifyContent='center'
+            alignItems='center'
           >
             <img
               src={imgHome}
               alt="logo"
               style={{
-                width: "600px",
-                height: "100px",
-                objectFit: "contain"
+                width: "200px",
+                height: "130px",
+                borderRadius: "50px"
               }}
             />
-          </div>
+          </Flex>
         )}
         <Flex
           alignItems='center'
@@ -212,13 +208,15 @@ function signin() {
           mx={{ base: "auto", lg: "unset" }}
           ms={{ base: "auto", lg: "auto" }}
           w={{ base: "100%", md: "50%", lg: "450px" }}
-          px='50px'>
+          px='50px'
+        >
           <Flex
             direction='column'
-            w='100%'
+            w={{ base: "100%", lg: "fit-content" }}
             background='transparent'
             mt={{ base: "50%", md: "100px", lg: "120px", xl: "100px" }} // altura del formulario
-            mb={{ base: "60px", lg: "80px" }}>
+            mb={{ base: "60px", lg: "80px" }}
+          >
             <Heading color={titleColor} fontSize='32px' mb='10px'>
               Bienvenid@!
             </Heading>
@@ -245,11 +243,11 @@ function signin() {
                 <Input
                   color='white'
                   bg='rgb(19,21,54)'
-                  border='transparent'
+                  //border='transparent'
                   borderRadius='20px'
                   fontSize='sm'
                   size='lg'
-                  w={{ base: "100%", md: "346px" }}
+                  w={{ base: "100%", md: "100%", lg: "346px" }}
                   maxW='100%'
                   h='46px'
                   placeholder='Ingresa tu DNI o correo electrónico'
@@ -296,11 +294,11 @@ function signin() {
                       <Input
                           color='white'
                           bg='rgb(19,21,54)'
-                          border='transparent'
+                          //border='transparent'
                           borderRadius='20px'
                           fontSize='sm'
                           size='lg'
-                          w={{ base: "100%", md: "346px" }}
+                          w={{ base: "100%", md: "100%", lg: "346px" }}
                           maxW='100%'
                           type={showPassword ? 'text' : 'password'} // Condicional para cambiar el tipo de input
                           placeholder='Ingresa tu contraseña'

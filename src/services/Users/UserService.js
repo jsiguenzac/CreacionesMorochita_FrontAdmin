@@ -113,3 +113,21 @@ export const DashboardCardInfoService = async () => {
     else
         return { data: null, msg: result?.data?.mensaje};
 }
+
+export const UserProfileService = async () => {
+    const [result, error] = await doRequest(
+        "/User/Profile",
+        "GET",
+        null,
+        getToken()
+    );
+    
+    if (error)
+        return;
+
+    const state = result?.state;
+    if(state === 1)
+        return { data: result?.data?.sales_by_user, msg: result?.data?.mensaje};
+    else
+        return { data: null, msg: result?.data?.mensaje};
+}

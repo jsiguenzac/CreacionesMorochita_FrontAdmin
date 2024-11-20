@@ -17,7 +17,7 @@ import {
 	Text,
 	useDisclosure
 } from '@chakra-ui/react';
-import avatar11 from 'assets/img/avatars/avatar11.png';
+import avatarProfile from 'assets/img/user-profile.png';
 
 // Custom components
 import Card from 'components/Card/Card';
@@ -41,6 +41,7 @@ import {
 } from 'variables/charts';
 import { CustomModal } from 'components/Modal/ModalMessage';
 import { DetailUser } from 'services/Profile/DetailUserService';
+import { UserProfileService } from 'services/Users/UserService';
 import DotSpin from 'components/utils/BounciLoader';
 
 import { EditProfileButton } from '../components/profile/EditProfileButton';
@@ -50,6 +51,7 @@ export default function Profile() {
     const [loading, setLoading] = useState(false);
     const [err, setErr] = useState("");
     const [dataUser, setDataUser] = useState(null);
+    const [dataInfo, setDataInfo] = useState(null);
 	
     const user = getUser();
 	
@@ -91,6 +93,26 @@ export default function Profile() {
         }
     };
 
+	const handleProfileInfo = async () => {
+		setLoading(true);
+		try {
+			const { data, msg } = await UserProfileService();
+			console.log("data: ", data);
+			if (data) {
+				setDataInfo(data);
+			} else {
+				setErr("Error al obtener la información del usuario");
+				handleShowModalErr();
+			}
+		} catch (error) {
+			console.error("Error al obtener datos del usuario: ", error);
+			setErr("Ocurrió un error inesperado al obtener datos del usuario");
+			handleShowModalErr();
+		} finally {
+			setLoading(false);
+		}
+	};
+
     useEffect(() => {
         if (user && !dataUser) {
             handleDataUser();
@@ -98,6 +120,7 @@ export default function Profile() {
 		if (onCloseErr) {
 			setErr("");
 		}
+		handleProfileInfo();
     }, []);
 
 	// Creamos una constante con los datos a editar
@@ -145,7 +168,7 @@ export default function Profile() {
 							direction={{ sm: 'column', md: 'row' }}
 							w={{ sm: '100%' }}
 							textAlign={{ sm: 'center', md: 'start' }}>
-							<Avatar me={{ md: '22px' }} src={avatar11} w='80px' h='80px' borderRadius='15px'>
+							<Avatar me={{ md: '22px' }} src={avatarProfile} w='80px' h='80px' bg='transparent' borderRadius='15px'>
 								{/* <AvatarBadge
 									cursor='pointer'
 									borderRadius='8px'
@@ -215,16 +238,16 @@ export default function Profile() {
 				align={{ sm: 'center', md: 'flex-start' }}
 				direction={{ base: 'column', lg: 'row' }} // Column in smaller screens, row in larger screens
 				//justify="space-between" // Space between the cards
-				justifyContent={{ sm: 'center', md: 'space-between' }}
-				wrap="wrap"
+				justifyContent='center'
 				w="100%"
+				height={{ sm: 'auto', md: 'auto' }}
 				gap="24px"
 				>
 				{/* Información Card */}
 				<Card
 					p="16px"
-					maxH={{ md: '410px' }}
-					maxW={{ sm: '325px', md: '725px', lg: '770px' }}
+					maxH={{ md: 'auto' }}
+					maxW={{ sm: '325px', md: '350px', lg: '380px' }}
 					gridArea={{ xl: '1 / 2 / 2 / 3', '2xl': 'auto' }}
 					flex="1"
 				>
@@ -239,16 +262,21 @@ export default function Profile() {
 					</Flex>
 					</CardHeader>
 					<CardBody w="100%">
-					<Flex w="100%" direction={{ sm: 'column', md: 'row' }}>
+					<Flex
+						w="100%"
+						direction={{ sm: 'row', md: 'row' }}
+						justifyContent={{ sm: 'center', md: 'space-between' }}
+						alignItems="center"
+					>
 						<Flex
-						direction="column"
-						align="center"
-						me={{ md: '16px', lg: '50px' }}
-						mb={{ sm: '12px', md: '0px' }}
+							direction="column"
+							align="center"
+							me={{ md: '16px', lg: '50px' }}
+							mb={{ sm: '12px', md: '0px' }}
 						>
 						<CircularProgress
 							size={200}
-							value={68}
+							value={Number(dataInfo?.sales_month_current) || 0}
 							thickness={6}
 							color="green.400"
 							variant="vision"
@@ -256,114 +284,88 @@ export default function Profile() {
 							<CircularProgressLabel>
 							<Flex direction="column" justify="center" align="center">
 								<Text color="#fff" fontSize="36px" fontWeight="bold" mb="6px">
-								68%
+								{dataInfo?.sales_month_current || 0}
 								</Text>
 								<Text color="gray.400" fontSize="sm">
-								Current load
+								Ventas {`en ${dataInfo?.name_month_current}` || 'en el mes actual'}
 								</Text>
 							</Flex>
 							</CircularProgressLabel>
 						</CircularProgress>
 						<Flex direction="column" mt="18px" align="center">
-							<Text color="#fff" fontSize="lg" fontWeight="bold" mb="2px">
-							0h 58 min
-							</Text>
-							<Text color="gray.500" fontSize="sm">
-							Time to full charge
+							{/* <Text color="#fff" fontSize="lg" fontWeight="bold" mb="2px">
+								{dataInfo?.name_month_current || 'en el mes actual'}
+							</Text> */}
+							<Text
+								color="gray.500"
+								fontSize="sm"
+								textAlign="center"
+								maxW="170px"
+							>
+								{dataInfo?.sales_month_current > 0 
+									? `Este mes haz registrado un total de ${dataInfo?.sales_month_current} ventas.` 
+									: `Todavía no tienes ventas registradas este mes.`}
 							</Text>
 						</Flex>
 						</Flex>
 						<Grid
-						templateColumns={{ sm: '1fr', md: 'repeat(2, 1fr)' }}
-						gap="24px"
-						w="100%"
-						alignSelf="flex-start"
+							templateColumns="1fr" // Una sola columna
+							gap="24px"
+							w="100%"
+							alignSelf="flex-start"
+							marginRight={{ sm: '10px', md: '0px', lg: '0px' }}
 						>
-						{/* Cards inside the information card */}
-						<Flex
-							align="center"
-							p="18px"
-							justify="space-between"
-							bg="linear-gradient(126.97deg, rgba(6, 11, 38, 0.74) 28.26%, rgba(26, 31, 55, 0.5) 91.2%)"
-							borderRadius="20px"
-						>
-							<Flex direction="column" me="auto">
-							<Text fontSize="xs" color="gray.400" mb="3px">
-								Battery Health
-							</Text>
-							<Text color="#fff" fontSize="20px" fontWeight="bold">
-								76%
-							</Text>
-							</Flex>
-							<IconBox bg="brand.200" w="40px" h="40px" direction="column">
-							<CarIcon w="28px" h="28px" />
-							<FulgerWhiteIcon w="8px" h="11px" transform="rotate(90deg)" />
-							</IconBox>
-						</Flex>
-						{/* Add other inner cards here */}
-						<Flex
-							align="center"
-							p="18px"
-							justify="space-between"
-							bg="linear-gradient(126.97deg, rgba(6, 11, 38, 0.74) 28.26%, rgba(26, 31, 55, 0.5) 91.2%)"
-							borderRadius="20px"
-						>
-						<Flex direction='column' me='auto'>
-									<Text fontSize='xs' color='gray.400' mb='3px'>
-										Efficiency
-									</Text>
-									<Text color='#fff' fontSize='20px' fontWeight='bold'>
-										+20%
-									</Text>
+							<Flex
+								align="center"
+								p="18px"
+								justify="space-between"
+								bg="linear-gradient(126.97deg, rgba(6, 11, 38, 0.74) 28.26%, rgba(26, 31, 55, 0.5) 91.2%)"
+								borderRadius="20px"
+								w="fit-content" // Ajustar al contenido
+							>
+								<Flex direction="column" me="auto">
+								<Text fontSize="xs" color="gray.400" mb="3px">
+									Completas
+								</Text>
+								<Text color="#fff" fontSize="20px" fontWeight="bold">
+									{dataInfo?.sales_status?.complete || 0}
+								</Text>
 								</Flex>
-								<Box maxH='75px'>
-									<LineChart
-										lineChartData={lineChartDataProfile1}
-										lineChartOptions={lineChartOptionsProfile1}
-									/>
-								</Box>
-						</Flex>
-						<Flex
-							align="center"
-							p="18px"
-							justify="space-between"
-							bg="linear-gradient(126.97deg, rgba(6, 11, 38, 0.74) 28.26%, rgba(26, 31, 55, 0.5) 91.2%)"
-							borderRadius="20px"
-						>
-							<Flex direction='column' me='auto'>
-								<Text fontSize='xs' color='gray.400' mb='3px'>
-									Consumption
-								</Text>
-								<Text color='#fff' fontSize='20px' fontWeight='bold'>
-									163W/km
-								</Text>
 							</Flex>
-							<IconBox bg='brand.200' w="40px" h="40px" >
-								<FulgerWhiteIcon w='24px' h='24px' color='#fff' />
-							</IconBox>
-						</Flex>
-						<Flex
-							align="center"
-							p="18px"
-							justify="space-between"
-							bg="linear-gradient(126.97deg, rgba(6, 11, 38, 0.74) 28.26%, rgba(26, 31, 55, 0.5) 91.2%)"
-							borderRadius="20px"
-						>
-							<Flex direction='column' me='auto'>
-								<Text fontSize='xs' color='gray.400' mb='3px'>
-									This Week
+							<Flex
+								align="center"
+								p="18px"
+								justify="space-between"
+								bg="linear-gradient(126.97deg, rgba(6, 11, 38, 0.74) 28.26%, rgba(26, 31, 55, 0.5) 91.2%)"
+								borderRadius="20px"
+								w="fit-content" // Ajustar al contenido
+							>
+								<Flex direction="column" me="auto">
+								<Text fontSize="xs" color="gray.400" mb="3px">
+									Pendientes
 								</Text>
-								<Text color='#fff' fontSize='20px' fontWeight='bold'>
-									1.342km
+								<Text color="#fff" fontSize="20px" fontWeight="bold">
+								{dataInfo?.sales_status?.pending || 0}
 								</Text>
+								</Flex>
 							</Flex>
-							<Box maxH='75px'>
-								<LineChart
-									lineChartData={lineChartDataProfile2}
-									lineChartOptions={lineChartOptionsProfile2}
-								/>
-							</Box>
-						</Flex>
+							<Flex
+								align="center"
+								p="18px"
+								justify="space-between"
+								bg="linear-gradient(126.97deg, rgba(6, 11, 38, 0.74) 28.26%, rgba(26, 31, 55, 0.5) 91.2%)"
+								borderRadius="20px"
+								w="fit-content" // Ajustar al contenido
+							>
+								<Flex direction="column" me="auto">
+								<Text fontSize="xs" color="gray.400" mb="3px">
+									Anuladas
+								</Text>
+								<Text color="#fff" fontSize="20px" fontWeight="bold">
+									{dataInfo?.sales_status?.annul || 0}
+								</Text>
+								</Flex>
+							</Flex>
 						</Grid>
 					</Flex>
 					</CardBody>
@@ -372,8 +374,9 @@ export default function Profile() {
 				<Card
 					p="16px"
 					bgSize="cover"
-					maxW={{ sm: '325px', md: '725px', lg: '380px' }}
-					h={{ sm: '270px', lg: '350px', xl: '310px' }}
+					maxW={{ sm: '325px', md: '350px', lg: '380px' }}
+					maxH={{ sm: '310px', md: 'auto', lg: 'auto' }}
+					h={{ sm: '250px', lg: '350px', xl: '310px' }}
 					flexBasis="380px"
 				>
 					<CardHeader p="12px 5px" mb="12px">
