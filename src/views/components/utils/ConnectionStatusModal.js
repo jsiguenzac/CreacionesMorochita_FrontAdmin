@@ -16,6 +16,13 @@ import imgNotConected from "../../../assets/img/not_conected.png";
 
 const ConnectionStatusModal = ( { isOnline } ) => {
   if (isOnline) return null;
+
+  const loadImageFromLocalStorage = () => {
+    const imageDataUrl = localStorage.getItem('offline-image');
+    if (imageDataUrl) return imageDataUrl;
+    return imgNotConected;
+  };
+
   const handleReload = () => {
     window.location.reload();
   };
@@ -55,8 +62,8 @@ const ConnectionStatusModal = ( { isOnline } ) => {
           <ModalBody>
             <Flex direction="column" align="center" justify="center" gap={4}>
               <Image
-                src={imgNotConected}
-                alt="No Connection"
+                src={loadImageFromLocalStorage()}
+                alt="No Connection ☹"
                 boxSize="100px"
                 mb={4}
                 width={{ base: "50%", md: "250px" }}

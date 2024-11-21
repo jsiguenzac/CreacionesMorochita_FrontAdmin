@@ -27,6 +27,7 @@ import signinImage from "assets/img/fondoHome.png";
 import imgHome from 'assets/img/fondoHome3.jpg';
 import { LoginService, RecoverAccessService, savePermissions, clearAllStorage } from "../../services/Auth/tokenService";
 import { PermissionsListService } from "../../services/Auth/PermissionsService";
+import imgNotConected from "../../assets/img/not_conected.png";
 
 // Custom Components
 import AuthFooter from "components/Footer/AuthFooter";
@@ -163,7 +164,22 @@ function signin() {
   
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
+  // Guardar imagen sin conexión
+  const saveImageToLocalStorage = () => {
+    fetch(imgNotConected)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          // la imagen almacenada como un Data URL en LocalStorage
+          localStorage.setItem('offline-image', reader.result);
+        };
+        reader.readAsDataURL(blob);
+      });
+  };
+
   useEffect(() => {
+    saveImageToLocalStorage();
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
