@@ -619,10 +619,7 @@ function Sales() {
                   saleDate={row.date_sale}
                   totalSale={row.total}
                   status={row.name_status}
-                  onViewDetails={() => {
-                    handleDetailsSale(row.id_sale);
-                    handleOpenModal(row);
-                  }}
+                  onViewDetails={() => handleOpenModal(row)}
                 />
               ))}
             </Tbody>
