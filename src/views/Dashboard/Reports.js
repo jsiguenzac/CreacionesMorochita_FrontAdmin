@@ -120,14 +120,6 @@ function Reports() {
 
   const handleDownloadReport = async () => {
     try {
-      if (filters.dateInit === "" || filters.dateEnd === "") {
-        // poner la fecha de inicio y fin del dia actual
-        setFilters({
-          ...filters,
-          dateInit: today,
-          dateEnd: today,
-        });
-      }
       const tsInit = dateToTimestamp(filters.dateInit);
       const tsEnd = dateToTimestamp(filters.dateEnd);
       const form = {
