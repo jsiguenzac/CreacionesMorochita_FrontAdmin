@@ -107,3 +107,32 @@ export const SalesDetailsService = async (id_sale) => {
     else
         return { data: null, msg: "Error desconocido"};
 }
+
+export const GenerateBoletaService = async (id_sale) => {
+    const [result, error] = await doRequest(
+        `/Sales/Boleta/Generate/${Number(id_sale)}`,
+        "POST",
+        null,
+        getToken(),
+        true
+    );
+    
+    if (error) {
+        console.error("Error al descargar la boleta:", error);
+        return { exito: false, msg: "ERROR_AL_DESCARGAR" };
+    }
+    const state = result?.state;
+    if (state === 0) {
+        return { exito: false, msg: result?.data?.mensaje || "ERROR_DESCONOCIDO" };
+    }
+    // Crear enlace para descargar el archivo
+    const url = window.URL.createObjectURL(result.blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = result.filename || `Boleta_Venta_${Number(id_sale)}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+    return { exito: true, msg: "BOLETA_DESCARGADA" };
+}

@@ -40,7 +40,8 @@ import {
   SalesListService,
   SalesCreateService,
   SalesUpdateService,
-  SalesDetailsService
+  SalesDetailsService,
+  GenerateBoletaService
 } from "services/Sales/SalesService";
 import { UserListService } from "services/Users/UserService";
 import DotSpin from "components/utils/BounciLoader";
@@ -417,6 +418,47 @@ function Sales() {
     }
   }
 
+  const handleGenerateBoleta = async (id_sale) => {
+    try {
+      setLoading(true);
+      setMsg("Descargando boleta de venta...");
+      const { exito, msg } = await GenerateBoletaService(id_sale);
+      if (exito) {
+        toast({
+          title: "Boleta descargada",
+          description: "La boleta de venta se descargó correctamente",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+      else {
+        console.log("BoletERR", msg);
+        toast({
+          title: "¡Oh no!",
+          description: "Ocurrió un error al generar la boleta de venta.\nPor favor, inténtelo de nuevo más tarde",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    }
+    catch (error) {
+      console.error("Error al generar boleta:", error);
+      toast({
+        title: "¡Oh no!",
+        description: "Ocurrió un error inesperado al generar la boleta de venta.\nContacte al desarrollador",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+    finally {
+      setLoading(false);
+      setMsg("");
+    }
+  };
+
   return (
     <Flex direction="column" pt={{ base: "120px", md: "75px" }}>
       <Card mb="22px">
@@ -620,6 +662,7 @@ function Sales() {
                   totalSale={row.total}
                   status={row.name_status}
                   onViewDetails={() => handleOpenModal(row)}
+                  generatePDF={() => handleGenerateBoleta(row.id_sale)}
                 />
               ))}
             </Tbody>

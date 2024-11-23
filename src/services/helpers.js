@@ -69,7 +69,16 @@ const doRequest = async (
         .padStart(2, "0")}-${now.getMinutes()
         .toString()
         .padStart(2, "0")}-${now.getSeconds().toString().padStart(2, "0")}`;
-      const filename = `Reporte_Ventas_${timestamp}.xlsx`;
+      
+        let filename = "";
+      if (contentType.includes("application/pdf")) {
+        // filename += `Boleta_Venta_${timestamp}.pdf`;
+      } else if (contentType.includes("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) {
+        filename += `Reporte_Ventas_${timestamp}.xlsx`;
+      } else {
+        filename += ".bin"; // Tipo genérico si no se reconoce el Content-Type
+      }
+
       return [{ blob, filename }, null];
     } else {
       // Manejar respuesta JSON

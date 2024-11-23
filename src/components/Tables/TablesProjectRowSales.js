@@ -8,9 +8,9 @@ import {
   Button,
   Icon
 } from "@chakra-ui/react";
-import { FaInfoCircle } from "react-icons/fa";
+import { FaInfoCircle, FaRegFilePdf } from "react-icons/fa";
 
-function TableRowSales({ customerName, payment, saleDate, totalSale, status, onViewDetails }) {
+function TableRowSales({ customerName, payment, saleDate, totalSale, status, onViewDetails, generatePDF }) {
     const statusColorsMap = {
         Completa: "green",
         Pendiente: "red",
@@ -54,17 +54,31 @@ function TableRowSales({ customerName, payment, saleDate, totalSale, status, onV
         </Badge>
       </Td>
       <Td>
-        <Button
-          onClick={onViewDetails}
-          borderRadius="12px"
-          bg="blue.500"
-          color="white"
-          _hover={{ bg: "blue.600" }}
-          _active={{ bg: "blue.700" }}
-          leftIcon={<Icon as={FaInfoCircle} />}
-        >
-          Ver Detalles
-        </Button>
+        <Flex direction={{ base: "column", md: "row" }} gap="20px">
+          <Button
+            onClick={onViewDetails}
+            borderRadius="12px"
+            bg="blue.500"
+            color="white"
+            _hover={{ bg: "blue.600" }}
+            _active={{ bg: "blue.700" }}
+            leftIcon={<Icon as={FaInfoCircle} />}
+          >
+            Ver Detalles
+          </Button>
+          <Button
+            onClick={generatePDF}
+            display={status === "Completa" ? "block" : "none"}
+            borderRadius="12px"
+            bg="red.400"
+            color="white"
+            _hover={{ bg: "red.600" }}
+            _active={{ bg: "red.700" }}
+            leftIcon={<Icon as={FaRegFilePdf} />}
+          >
+            Boleta
+          </Button>
+        </Flex>
       </Td>
     </Tr>
   );
